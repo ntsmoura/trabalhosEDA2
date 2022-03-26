@@ -2,16 +2,18 @@
 Author: Natan Moura
 Teacher: Flávio Assis Silva
 Class: MATA54
+File: record.h
 */
 
 #include<stdbool.h>
 
-#define NUMBEROFRECORDS 11
+#define MAXNAMESIZE 20
+#define MAXNUMREGS 11
 
 //Struct for user data
 typedef struct {
-	   unsigned int key;
-	   char* name;
+	   int key;
+	   char name[MAXNAMESIZE];
       unsigned int age;
 } user_data;
 

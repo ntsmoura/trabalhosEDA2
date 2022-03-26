@@ -1,10 +1,16 @@
+/* 
+Author: Natan Moura
+Teacher: Flávio Assis Silva
+Class: MATA54
+File: main.c
+*/
+
 #include<stdio.h>
 #include<stdlib.h>
-
-#define MAXNAMESIZE 20
+#include "file_manager.h"
 
 int main(){
 
-    
+    print_data();
 
 }
