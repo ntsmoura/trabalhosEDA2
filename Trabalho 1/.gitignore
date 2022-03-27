@@ -3,3 +3,5 @@ records
 ./vscode
 in.txt
 out.txt
+main.o
+file_manager.o

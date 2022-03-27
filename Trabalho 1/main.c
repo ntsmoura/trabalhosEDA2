@@ -16,6 +16,7 @@ int main(){
     char name[MAXNAMESIZE];
     int* number_of_access = malloc(sizeof(int));
     int* last_position = malloc(sizeof(int));
+    int* first_insert_position = malloc(sizeof(int));
     int number_of_success = 0, number_of_fails = 0, number_of_attempts_success = 0, number_of_attempts_fails = 0;
     record* r = malloc(sizeof(record));
     
@@ -48,17 +49,25 @@ int main(){
             }
             break;
             case 'm':{
-                printf("%.1f\n",((float)number_of_attempts_success)/((float)number_of_success));
-                printf("%.1f\n",((float)number_of_attempts_fails)/((float)number_of_fails));
+                if(number_of_success > 0) printf("%.1f\n",((float)number_of_attempts_success)/((float)number_of_success));
+                else printf("%.1f\n",0.0);
+                if(number_of_fails > 0) printf("%.1f\n",((float)number_of_attempts_fails)/((float)number_of_fails));
+                else printf("%.1f\n",0.0);
             }
             break;
             case 'p':{
                 print_data();
             }
             break;
+            case 'r':{
+                scanf("%d",&key);
+                delete_data(key);
+            }
+            break;
             case 'e':{
                 free(number_of_access);
                 free(last_position);
+                free(first_insert_position);
                 free(r);
             }
             break;
