@@ -34,7 +34,7 @@ int main(){
                 *number_of_access = 0;
                 *last_position = 0;
                 scanf("%d",&key);
-                bool result = search_data(key,number_of_access,last_position,r);
+                bool result = search_data(key,number_of_access,last_position, first_insert_position, r);
                 if(result){
                     printf("chave: %d\n",key);
                     printf("%s\n",r->data.name);
