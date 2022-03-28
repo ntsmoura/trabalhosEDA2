@@ -71,50 +71,34 @@ bool search_data(int key, int* number_of_access, int* last_position, int* first_
         return false;
     }
     else{
-        if (r.status=='*' && *first_insert_position == -1) (*first_insert_position) = h1;
+        if(r.status == '*' && (*first_insert_position == -1)) (*first_insert_position) = h1;
         int h2 = hash_h2(key);
-        fseek (f,set_offset(h2), SEEK_SET);
-        fread (&r, sizeof (record), 1, f);
-        (*number_of_access)++;
-        (*last_position) = h2;
-        if(r.status=='o' && r.data.key==key){ 
-            fclose(f);
-            *return_record =  r;
-            return true;
-        }
-        else if(r.status == 'e'){
-            fclose(f);
-            return false;
-        }
-        else{
-            if (r.status=='*' && *first_insert_position == -1) (*first_insert_position) = h2;
-            int position = (h1 + h2) % MAXNUMREGS;
-            while(position != h1){
-                fseek (f,set_offset(position), SEEK_SET);
-                fread (&r, sizeof (record), 1, f);
-                (*number_of_access)++;
-                (*last_position) = position;
-                if(r.status=='e') break;
-                else if(r.status == '*'){
-                    if(*first_insert_position == -1) (*first_insert_position) = position;
-                    position+= h2;
-                    position = position % MAXNUMREGS;
-                    continue;
-                }
-                else if(r.data.key==key){
-                    fclose(f);
-                    *return_record = r;
-                    return true;
-                }
+        int position = (h1 + h2) % MAXNUMREGS;
+        while(position != h1){
+            fseek (f,set_offset(position), SEEK_SET);
+            fread (&r, sizeof (record), 1, f);
+            (*number_of_access)++;
+            (*last_position) = position;
+            if(r.status=='e') break;
+            else if(r.status == '*'){
+                if(*first_insert_position == -1) (*first_insert_position) = position;
                 position+= h2;
                 position = position % MAXNUMREGS;
+                continue;
             }
-            (*last_position) = position;
-            fclose(f);
-            return false;
+            else if(r.data.key==key){
+                fclose(f);
+                *return_record = r;
+                return true;
+            }
+            position+= h2;
+            position = position % MAXNUMREGS;
         }
-	    
+        (*last_position) = position;
+        fclose(f);
+        return false;
     }
+
 }
 
 //Insert data in a file
