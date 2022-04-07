@@ -17,8 +17,10 @@ int hash_h1(int key){
 
 //h2 function for hashing
 int hash_h2(int key){
-    if (key < MAXNUMREGS) return 1;
-    else return (key / MAXNUMREGS) % MAXNUMREGS;
+    int right = 1;
+    int left = (key / MAXNUMREGS) % MAXNUMREGS;
+    if (left >= right) return left;
+    else return right;
 }
 
 //Calculates offset for given position
