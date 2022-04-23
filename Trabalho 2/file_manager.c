@@ -16,10 +16,15 @@ int random(int min, int max){
     return min + rand() % (max + 1 - min);
 }
 
+//Return the hashing value based on input parameters
+int universal_hashing(int key,int a, int b, int prime, int m){
+    return ((a*key+b)%prime)%m;
+}
+
 //print structure of the file (for debug process only)
 void print_structure(){
     FILE *f;
-    f = fopen("records.dat","r");
+    if(!(f = fopen("records.dat","r"))) exit(-1);
     int number;
     fread(&number,sizeof(int),1,f);
     printf("%d\n",number);
@@ -63,4 +68,71 @@ void create_file(int a, int b, int m){
 	fclose(f);
 
 }
+
+//Create temporary file to store data
+void create_temporary_file(){
+    FILE *f;
+    if(!(f = fopen("temporary.dat","w+"))) exit(-1);
+    fclose(f);
+}
+
+//Insert data in temporary file
+void insert_temporary_file(int key, char name[MAXNAMESIZE], int age){
+    FILE *f;
+    if(!(f = fopen("temporary.dat","r+"))) exit(-1);
+    fseek(f,0,SEEK_END);
+    record r;
+    r.status = 'o';
+    r.data.key = key;
+    r.data.age = age;
+    strcpy(r.data.name, name);
+    fwrite(&r,sizeof(record),1,f);
+    fclose(f);
+}
  
+//Print temporary file content (for debug process only)
+void print_temporary_file(int m){
+    FILE *f;
+    if(!(f = fopen("temporary.dat","r"))) exit(-1);
+    record r;
+    int i;
+    int number;
+    for(i = 0; i<m;i++){
+        fread(&r,sizeof(record),1,f);
+        printf("CHAVE: %d, NOME: %s, IDADE: %d\n",r.data.key,r.data.name,r.data.age);
+    }
+    for(i = 0; i<m;i++){
+        fread(&number, sizeof(int),1,f);
+        printf("COLISOES NIVEL %d: %d\n",i,number);
+    }
+    fclose(f);
+    
+}
+
+//Calculates the number of elements per index and store in the temporary file
+void calculate_elements_first_level(int a,int b,int p,int m){
+    FILE *f;
+    if(!(f = fopen("temporary.dat","r+"))) exit(-1);
+    fseek(f,0,SEEK_END);
+    int number = 0;
+    int i;
+    for (i = 0; i<m;i++){
+        fwrite(&number,sizeof(int),1,f);
+    }
+    record r;
+    int result = 0;
+    int position = 0;
+    for(i = 0; i<m;i++){
+        fseek(f,i*sizeof(record),SEEK_SET);
+        fread(&r,sizeof(record),1,f);
+        result = universal_hashing(r.data.key,a,b,p,m);
+        position = m*sizeof(record) + result*sizeof(int);
+        fseek(f,position,SEEK_SET);
+        int value = 0;
+        fread(&value,sizeof(int),1,f);
+        value++;
+        fseek(f,position,SEEK_SET);
+        fwrite(&value,sizeof(int),1,f);
+    }
+    fclose(f);
+}
