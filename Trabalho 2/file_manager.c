@@ -22,7 +22,7 @@ int universal_hashing(int key,int a, int b, int prime, int m){
 //print structure of the file (for debug process only)
 void print_structure(){
     FILE *f;
-    if(!(f = fopen("records.dat","r"))) exit(-1);
+    if(!(f = fopen("records.dat","rb"))) exit(-1);
     int number;
     fread(&number,sizeof(int),1,f);
     printf("%d\n",number);
@@ -54,7 +54,7 @@ void create_file(int a, int b, int m){
 
     FILE *f;
 
-	if(!(f = fopen("records.dat","w+"))) exit(-1);
+	if(!(f = fopen("records.dat","wb+"))) exit(-1);
     fwrite(&a,sizeof(int),1,f);
     fwrite(&b,sizeof(int),1,f);
     int prime = PRIME;
@@ -79,14 +79,14 @@ void create_file(int a, int b, int m){
 //Create temporary file to store data
 void create_temporary_file(){
     FILE *f;
-    if(!(f = fopen("temporary.dat","w+"))) exit(-1);
+    if(!(f = fopen("temporary.dat","wb+"))) exit(-1);
     fclose(f);
 }
 
 //Insert data in temporary file
 void insert_temporary_file(int key, char name[MAXNAMESIZE], int age){
     FILE *f;
-    if(!(f = fopen("temporary.dat","r+"))) exit(-1);
+    if(!(f = fopen("temporary.dat","rb+"))) exit(-1);
     fseek(f,0,SEEK_END);
     record r;
     r.status = true;
@@ -100,7 +100,7 @@ void insert_temporary_file(int key, char name[MAXNAMESIZE], int age){
 //Print temporary file content (for debug process only)
 void print_temporary_file(int m){
     FILE *f;
-    if(!(f = fopen("temporary.dat","r"))) exit(-1);
+    if(!(f = fopen("temporary.dat","rb"))) exit(-1);
     record r;
     int i;
     int number;
@@ -124,7 +124,7 @@ void delete_temporary_file(){
 //Calculates the number of elements per index and store in the temporary file
 void calculate_elements_first_level(int a,int b,int p,int m){
     FILE *f;
-    if(!(f = fopen("temporary.dat","r+"))) exit(-1);
+    if(!(f = fopen("temporary.dat","rb+"))) exit(-1);
     fseek(f,0,SEEK_END);
     int i;
     for (i = 0; i<m;i++){
@@ -152,7 +152,7 @@ void calculate_elements_first_level(int a,int b,int p,int m){
 //Find first level elements of each index
 record* first_level_elements(first_level f1, int a, int b, int p, int m, int* f1_size){
     FILE *f;
-    if(!(f = fopen("temporary.dat","r+"))) exit(-1);
+    if(!(f = fopen("temporary.dat","rb+"))) exit(-1);
     int base_position = m*sizeof(record) + (f1.index)*sizeof(int);
     fseek(f,base_position,SEEK_SET);
     int number;
@@ -187,7 +187,7 @@ record* first_level_elements(first_level f1, int a, int b, int p, int m, int* f1
 //Create second level structure
 void create_second_level(int a, int b, int m, int p){
     FILE *f;
-    if(!(f = fopen("records.dat","r+"))) exit(-1);
+    if(!(f = fopen("records.dat","rb+"))) exit(-1);
     int second_level_actual_offset = 0;
         for(int i = 0; i< m; i++){
             int position = 4*sizeof(int) + i*sizeof(first_level);
