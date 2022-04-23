@@ -34,7 +34,7 @@ void print_structure(){
     printf("%d\n",number);
     fread(&number,sizeof(int),1,f);
     printf("%d\n",number);
-        first_level f1;
+    first_level f1;
     for(int i = 0; i<number; i++){
         fread(&f1,sizeof(first_level),1,f);
         printf("F1: Index: %d, INFO: [%d,%d,%d], SECOND LEVEL: %d, SECOND LEVEL OFFSET: %d\n",f1.index,f1.info[0],f1.info[1],f1.info[2],f1.second_level,f1.second_level_offset);
@@ -135,4 +135,39 @@ void calculate_elements_first_level(int a,int b,int p,int m){
         fwrite(&value,sizeof(int),1,f);
     }
     fclose(f);
+}
+
+//Find first level elements of each index
+record* first_level_elements(first_level f1, int a, int b, int p, int m, int* f1_size){
+    FILE *f;
+    if(!(f = fopen("temporary.dat","r+"))) exit(-1);
+    int base_position = m*sizeof(record) + (f1.index)*sizeof(int);
+    fseek(f,base_position,SEEK_SET);
+    int number;
+    fread(&number,sizeof(int),1,f);
+    (*f1_size) = number;
+    fseek(f,0,SEEK_SET);
+    record* elements = calloc(number,sizeof(record));
+    int result = 0;
+    int actual = 0;
+    record r;
+    for(int i = 0; i<m;i++){
+        if (actual == number) break;
+        fseek(f,i*sizeof(record),SEEK_SET);
+        fread(&r,sizeof(record),1,f);
+        result = universal_hashing(r.data.key,a,b,p,m);
+        if(result == f1.index){
+            record copy;
+            copy.status = r.status;
+            copy.data.key = r.data.key;
+            strcpy(copy.data.name,r.data.name);
+            copy.data.age = r.data.age;
+            *(elements+actual) = copy;
+            actual++;
+        }
+    }
+    fclose(f);
+    return elements;
+    
+
 }

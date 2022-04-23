@@ -18,6 +18,7 @@ File: file_manager.h
     void insert_temporary_file(int key, char name[MAXNAMESIZE], int age); //Insert data in temporary file
     void print_temporary_file(int m); //print temporary file content (for development and debug process only)
     void calculate_elements_first_level(int a,int b,int p,int m); //Calculates the number of elements per index and store in the temporary file
+    record* first_level_elements(first_level f1, int a, int b, int p, int m, int* f1_size); //Find first level elements of each index
 
 
 #endif
