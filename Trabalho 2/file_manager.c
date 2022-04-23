@@ -10,7 +10,7 @@ File: file_manager.c
 #include "record.h"
 #include <string.h>
 //Generate a random int between min and max 
-int random(int min, int max){
+int random_number(int min, int max){
     return min + rand() % (max + 1 - min);
 }
 
@@ -137,7 +137,6 @@ void calculate_elements_first_level(int a,int b,int p,int m){
     for(i = 0; i<m;i++){
         fseek(f,i*sizeof(record),SEEK_SET);
         fread(&r,sizeof(record),1,f);
-        printf("KEY: %d\n",r.data.key);
         result = universal_hashing(r.data.key,a,b,p,m);
         position = m*sizeof(record) + result*sizeof(int);
         fseek(f,position,SEEK_SET);
@@ -201,7 +200,6 @@ void create_second_level(int a, int b, int m, int p){
             int m1 = f1_size*f1_size;
             
             //Way to set fixed A1 and B1 indexes, to debug purpose only
-            //printf("A1 e B1, NIVEL %d: ",i);
             //scanf("%d %d",&a1,&b1);
             if (m1 == 1){
                 a1 = 0;
@@ -213,8 +211,8 @@ void create_second_level(int a, int b, int m, int p){
                     found = 1;
                     int* second_level_keys = calloc(m1,sizeof(int));
                     for(int k = 0; k<m1;k++) *(second_level_keys+k) = 0;
-                    a1 = random(1,PRIME-1);
-                    b1 = random(0,PRIME-1);
+                    a1 = random_number(1,PRIME-1);
+                    b1 = random_number(0,PRIME-1);
                     for(int j = 0; j<f1_size;j++){
                         int key = (*(elements+j)).data.key;
                         int result = universal_hashing(key,a1,b1,p,m1);

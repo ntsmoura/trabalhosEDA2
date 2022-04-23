@@ -32,16 +32,16 @@ int main(){
                     insert_temporary_file(key,name,age);
                 }
                srand(time(NULL)); //Set seed of rand to current time
-                int a = random(1,PRIME-1);
+                int a = random_number(1,PRIME-1);
                 srand(time(0)); //Set seed of rand to the time passed since 1970 0h utc
-                int b = random(0,PRIME-1);
+                int b = random_number(0,PRIME-1);
                 //int a = 3;
                 //int b = 42;
                 srand(0); //Set seed of rand to 0
                 calculate_elements_first_level(a,b,PRIME,m);
-                //create_file(a,b,m);
-                //create_second_level(a,b,m,PRIME);
-                //delete_temporary_file();
+                create_file(a,b,m);
+                create_second_level(a,b,m,PRIME);
+                delete_temporary_file();
             }
             break;
             case 'p':{
@@ -51,9 +51,9 @@ int main(){
             }
             break;
             case '*':{
-               print_temporary_file(m);
+               //print_temporary_file(m);
                //printf("\n");
-               //print_structure();
+               print_structure();
                //printf("\n");
             }
             break;

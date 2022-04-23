@@ -12,7 +12,7 @@ File: file_manager.h
     #include "record.h"
 
     void create_file(int a, int b, int m); //Create records file
-    int random(int min, int max); //Generate random number between [min,max]
+    int random_number(int min, int max); //Generate random number between [min,max]
     void print_structure(); //Print file content(for development and debug process only)
     void create_temporary_file();  //Create temporary file to store data
     void insert_temporary_file(int key, char name[MAXNAMESIZE], int age); //Insert data in temporary file
