@@ -9,6 +9,11 @@ File: file_manager.c
 #include<stdlib.h>
 #include "record.h"
 #include <string.h>
+
+#define MAIN_FILE  "records.dat"
+#define TEMPORARY_DATA_FILE  "temporary.dat"
+#define TEMPORARY_DATA_VECTOR_FILE  "vector.dat"
+
 //Generate a random int between min and max 
 int random_number(int min, int max){
     return min + rand() % (max + 1 - min);
@@ -22,7 +27,7 @@ int universal_hashing(int key,int a, int b, int prime, int m){
 //print structure of the file (for debug process only)
 void print_structure(){
     FILE *f;
-    if(!(f = fopen("records.dat","rb"))) exit(-1);
+    if(!(f = fopen(MAIN_FILE,"rb"))) exit(-1);
     int number;
     fread(&number,sizeof(int),1,f);
     printf("%d\n",number);
@@ -54,7 +59,7 @@ void create_file(int a, int b, int m){
 
     FILE *f;
 
-	if(!(f = fopen("records.dat","wb+"))) exit(-1);
+	if(!(f = fopen(MAIN_FILE,"wb+"))) exit(-1);
     fwrite(&a,sizeof(int),1,f);
     fwrite(&b,sizeof(int),1,f);
     int prime = PRIME;
@@ -79,14 +84,74 @@ void create_file(int a, int b, int m){
 //Create temporary file to store data
 void create_temporary_file(){
     FILE *f;
-    if(!(f = fopen("temporary.dat","wb+"))) exit(-1);
+    if(!(f = fopen(TEMPORARY_DATA_FILE,"wb+"))) exit(-1);
     fclose(f);
+}
+
+//Create temporary file for data vector
+void create_temporary_vector_file(){
+    FILE *f;
+    if(!(f = fopen(TEMPORARY_DATA_VECTOR_FILE,"wb+"))) exit(-1);
+    fclose(f);
+}
+
+//Return the record from a defined position in data vector file
+record return_vector_record(int position){
+    FILE *f;
+    if(!(f = fopen(TEMPORARY_DATA_VECTOR_FILE,"r"))) exit(-1);
+    fseek(f,position*sizeof(record),SEEK_SET);
+    record r;
+    fread(&r,sizeof(record),1,f);
+    fclose(f);
+    return r;
+}
+
+//Insert element inside data vector file
+void insert_vector_record(record r){
+    FILE *f;
+    if(!(f = fopen(TEMPORARY_DATA_VECTOR_FILE,"rb+"))) exit(-1);
+    fseek(f, 0,SEEK_END);
+    fwrite(&r,sizeof(record),1,f);
+    fclose(f);
+}
+
+//Reset every value to 0 in secondary collision detection vector
+void reset_vector_collision_flags(int numbers, int m){
+    FILE *f;
+    if(!(f = fopen(TEMPORARY_DATA_VECTOR_FILE,"rb+"))) exit(-1);
+    for(int i = 0; i< m; i++){
+        fseek(f, numbers*sizeof(record) + i*sizeof(int),SEEK_SET);
+        int value = 0;
+        fwrite(&value,sizeof(int),1,f);
+    }
+    fclose(f);
+}
+
+//Insert data in secondary integer "vector" for collision detection
+void insert_vector_collision_flag(int numbers, int position){
+    FILE *f;
+    if(!(f = fopen(TEMPORARY_DATA_VECTOR_FILE,"rb+"))) exit(-1);
+    fseek(f, numbers*sizeof(record) + position*sizeof(int),SEEK_SET);
+    int value = 1;
+    fwrite(&value,sizeof(int),1,f);
+    fclose(f);
+}
+
+//Return defined position data in secondary integer "vector" for collision detection
+int return_vector_collision_flag(int numbers, int position){
+    FILE *f;
+    if(!(f = fopen(TEMPORARY_DATA_VECTOR_FILE,"rb+"))) exit(-1);
+    fseek(f, numbers*sizeof(record) + position*sizeof(int),SEEK_SET);
+    int value = 0;
+    fread(&value,sizeof(int),1,f);
+    fclose(f);
+    return value;
 }
 
 //Insert data in temporary file
 void insert_temporary_file(int key, char name[MAXNAMESIZE], int age){
     FILE *f;
-    if(!(f = fopen("temporary.dat","rb+"))) exit(-1);
+    if(!(f = fopen(TEMPORARY_DATA_FILE,"rb+"))) exit(-1);
     fseek(f,0,SEEK_END);
     record r;
     r.status = true;
@@ -100,7 +165,7 @@ void insert_temporary_file(int key, char name[MAXNAMESIZE], int age){
 //Print temporary file content (for debug process only)
 void print_temporary_file(int m){
     FILE *f;
-    if(!(f = fopen("temporary.dat","rb"))) exit(-1);
+    if(!(f = fopen(TEMPORARY_DATA_FILE,"rb"))) exit(-1);
     record r;
     int i;
     int number;
@@ -117,14 +182,14 @@ void print_temporary_file(int m){
 }
 
 //Delete the temporary file
-void delete_temporary_file(){
-    if(remove("temporary.dat")) exit(-1);
+void delete_temporary_files(){
+    if(remove(TEMPORARY_DATA_FILE) || remove(TEMPORARY_DATA_VECTOR_FILE)) exit(-1);
 }
 
 //Calculates the number of elements per index and store in the temporary file
 void calculate_elements_first_level(int a,int b,int p,int m){
     FILE *f;
-    if(!(f = fopen("temporary.dat","rb+"))) exit(-1);
+    if(!(f = fopen(TEMPORARY_DATA_FILE,"rb+"))) exit(-1);
     fseek(f,0,SEEK_END);
     int i;
     for (i = 0; i<m;i++){
@@ -150,16 +215,16 @@ void calculate_elements_first_level(int a,int b,int p,int m){
 }
 
 //Find first level elements of each index
-record* first_level_elements(first_level f1, int a, int b, int p, int m, int* f1_size){
+void first_level_elements(first_level f1, int a, int b, int p, int m, int* f1_size){
+    create_temporary_vector_file();
     FILE *f;
-    if(!(f = fopen("temporary.dat","rb+"))) exit(-1);
+    if(!(f = fopen(TEMPORARY_DATA_FILE,"rb+"))) exit(-1);
     int base_position = m*sizeof(record) + (f1.index)*sizeof(int);
     fseek(f,base_position,SEEK_SET);
     int number;
     fread(&number,sizeof(int),1,f);
     (*f1_size) = number;
     fseek(f,0,SEEK_SET);
-    record* elements = calloc(number,sizeof(record));
     int result = 0;
     int actual = 0;
     record r;
@@ -169,25 +234,18 @@ record* first_level_elements(first_level f1, int a, int b, int p, int m, int* f1
         fread(&r,sizeof(record),1,f);
         result = universal_hashing(r.data.key,a,b,p,m);
         if(result == f1.index){
-            record copy;
-            copy.status = r.status;
-            copy.data.key = r.data.key;
-            strcpy(copy.data.name,r.data.name);
-            copy.data.age = r.data.age;
-            *(elements+actual) = copy;
+            insert_vector_record(r);
             actual++;
         }
     }
     fclose(f);
-    return elements;
-    
 }
 
 
 //Create second level structure
 void create_second_level(int a, int b, int m, int p){
     FILE *f;
-    if(!(f = fopen("records.dat","rb+"))) exit(-1);
+    if(!(f = fopen(MAIN_FILE,"rb+"))) exit(-1);
     int second_level_actual_offset = 0;
         for(int i = 0; i< m; i++){
             int position = 4*sizeof(int) + i*sizeof(first_level);
@@ -195,7 +253,7 @@ void create_second_level(int a, int b, int m, int p){
             first_level f1;
             fread(&f1,sizeof(first_level),1,f);
             int f1_size;
-            record *elements = first_level_elements(f1,a,b,p,m, &f1_size);
+            first_level_elements(f1,a,b,p,m, &f1_size);
             int a1=0,b1=0;
             int m1 = f1_size*f1_size;
             
@@ -209,20 +267,18 @@ void create_second_level(int a, int b, int m, int p){
                 int found = 0;
                 while(!found){
                     found = 1;
-                    int* second_level_keys = calloc(m1,sizeof(int));
-                    for(int k = 0; k<m1;k++) *(second_level_keys+k) = 0;
+                    reset_vector_collision_flags(f1_size,m1);
                     a1 = random_number(1,PRIME-1);
                     b1 = random_number(0,PRIME-1);
                     for(int j = 0; j<f1_size;j++){
-                        int key = (*(elements+j)).data.key;
+                        int key = return_vector_record(j).data.key;
                         int result = universal_hashing(key,a1,b1,p,m1);
-                        if(*(second_level_keys+result) == 1) {
+                        if(return_vector_collision_flag(f1_size,result) == 1) {
                             found = 0;
                             break;
                         }
-                        else (*(second_level_keys+result)) = 1;
+                        else insert_vector_collision_flag(f1_size,result);
                     }
-                    free(second_level_keys);
                 }
             }
             f1.info[0] = m1;
@@ -246,7 +302,7 @@ void create_second_level(int a, int b, int m, int p){
                 fwrite(&f2,sizeof(second_level),1,f);
             }
             for(int k = 0; k < f1_size; k++){
-                record r1 = *(elements+k);
+                record r1 = return_vector_record(k);
                 int result = universal_hashing(r1.data.key,a1,b1,p,m1);
                 int second_level_position = 4*sizeof(int) + m*sizeof(first_level) + f1.second_level_offset*sizeof(second_level) + result*sizeof(second_level);
                 second_level f2;
@@ -259,7 +315,6 @@ void create_second_level(int a, int b, int m, int p){
                 fseek(f,second_level_position,SEEK_SET);
                 fwrite(&f2,sizeof(second_level),1,f);
             }
-            free(elements);
         }
     fclose(f);
 }
