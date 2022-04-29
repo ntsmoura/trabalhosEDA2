@@ -25,5 +25,6 @@ File: file_manager.h
     void print_first_level();
     void print_second_level(int index);
     void print_full_second_level();
+    void number_of_functions();
 
 #endif

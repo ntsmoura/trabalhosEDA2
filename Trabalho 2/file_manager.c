@@ -319,7 +319,10 @@ void create_second_level(int a, int b, int m, int p){
     fclose(f);
 }
 
-//Gets the position of the register
+//Returns the position corresponding or returns -1
+//If theres not the second level in index of first level table
+//Or theres only one key in the index and it isnt corresponding
+//Or theres more than one key but all of them isnt corresponding
 int get_position(int key){
     FILE *f; 
     if(!(f = fopen(MAIN_FILE,"rb"))) exit(-1);
@@ -336,7 +339,9 @@ int get_position(int key){
     //Gets the m value of first level
     int m;
     fread(&m,sizeof(int),1,f);
+    //Gets the position by universal hashing
     int result = universal_hashing(key,a,b,prime,m);
+    //Adjust the possition in the file for the first level
     int first_level_position = 4*sizeof(int) + result*sizeof(first_level);
     fseek(f,first_level_position,SEEK_SET);
     first_level f1;
@@ -377,6 +382,7 @@ int get_position(int key){
 }
 
 //Query if there is a record with the corresponding key
+//Gets the position by the get_position function
 void consult_file(int key){
     int pos = get_position(key);
     if(pos == -1)
@@ -493,4 +499,20 @@ void print_full_second_level(){
         if(f1.second_level)
             print_second_level(i);
     }
+}
+
+//Print the number of functions 
+void number_of_functions(){
+    FILE *f; 
+    if(!(f = fopen(MAIN_FILE,"rb"))) exit(-1);
+    fseek(f,2*sizeof(int),SEEK_SET);
+    //Gets the prime value of first level
+    int prime;
+    fread(&prime,sizeof(int),1,f);
+    //Gets the m value of first level
+    int m;
+    fread(&m,sizeof(int),1,f);
+
+    int number_of_functions = prime * (prime-1);
+    printf("%d\n", number_of_functions);
 }
