@@ -442,6 +442,7 @@ void print_first_level(){
              printf("\n");
         }
     }
+    fclose(f);
 }
 
 //Print the second level
@@ -481,6 +482,7 @@ void print_second_level(int index){
                 printf("%d: %d\n", f2.index ,f2.r.data.key);
         }
     }
+    fclose(f);
 }
 
 //Print for every index that has at least one key
@@ -499,6 +501,7 @@ void print_full_second_level(){
         if(f1.second_level)
             print_second_level(i);
     }
+    fclose(f);
 }
 
 //Print the number of functions 
@@ -515,4 +518,5 @@ void number_of_functions(){
 
     int number_of_functions = prime * (prime-1);
     printf("%d\n", number_of_functions);
+    fclose(f);
 }
