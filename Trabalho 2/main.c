@@ -32,17 +32,23 @@ int main(){
                     insert_temporary_file(key,name,age);
                 }
                 srand(time(NULL)); //Set seed of rand to current time
-                int a = random_number(1,PRIME-1);
-                int b = random_number(0,PRIME-1);
-                //int a = 3;
-                //int b = 42;
+                //int a = random_number(1,PRIME-1);
+                //int b = random_number(0,PRIME-1);
+                int a = 3;
+                int b = 42;
                 calculate_elements_first_level(a,b,PRIME,m);
                 create_file(a,b,m);
                 create_second_level(a,b,m,PRIME);
                 delete_temporary_files();
             }
             break;
+            case 'c':{
+                scanf("%d",&key);
+                consult_file(key);
+            }
+            break;
             case 'p':{
+                print_first_level();
             }
             break;
             case 'e':{

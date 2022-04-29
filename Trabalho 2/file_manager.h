@@ -21,6 +21,7 @@ File: file_manager.h
     void calculate_elements_first_level(int a,int b,int p,int m); //Calculates the number of elements per index and store in the temporary file
     record* first_level_elements(first_level f1, int a, int b, int p, int m, int* f1_size); //Find first level elements of each index
     void create_second_level(int a, int b, int m, int p); //Create second level structure
-
+    void consult_file(int key);
+    void print_first_level();
 
 #endif

@@ -318,3 +318,122 @@ void create_second_level(int a, int b, int m, int p){
         }
     fclose(f);
 }
+
+//Gets the position of the register
+int get_position(int key){
+    FILE *f; //teste file no método que chama
+    if(!(f = fopen(MAIN_FILE,"rb"))) exit(-1);
+    fseek(f,0,SEEK_SET); 
+    //Gets the a value of first level
+    int a;
+    fread(&a,sizeof(int),1,f);
+    //Gets the b value of second level
+    int b;
+    fread(&b,sizeof(int),1,f);
+    //Gets the prime value of first level
+    int prime;
+    fread(&prime,sizeof(int),1,f);
+    //Gets the m value of first level
+    int m;
+    fread(&m,sizeof(int),1,f);
+    int result = universal_hashing(key,a,b,prime,m);
+    int first_level_position = 4*sizeof(int) + result*sizeof(first_level);
+    fseek(f,first_level_position,SEEK_SET);
+    first_level f1;
+    fread(&f1,sizeof(first_level),1,f);
+    if(!f1.second_level){
+        fclose(f);
+        return -1;
+    }
+    else if(f1.info[0] == 1){
+        int second_level_position = 4*sizeof(int) + m*sizeof(first_level) + f1.second_level_offset*sizeof(second_level);
+        fseek(f,second_level_position,SEEK_SET);
+        second_level f2;
+        fread(&f2,sizeof(second_level),1,f);
+        if(f2.r.status && f2.r.data.key == key){
+            fclose(f);
+            return second_level_position;
+        }
+        else{
+            fclose(f);
+            return -1;
+        }
+    }
+    else{
+        int result = universal_hashing(key,f1.info,b,prime,m);
+        int second_level_position = 4*sizeof(int) + m*sizeof(first_level) + f1.second_level_offset*sizeof(second_level) + result*sizeof(second_level);
+        fseek(f,second_level_position,SEEK_SET);
+        second_level f2;
+        fread(&f2,sizeof(second_level),1,f);
+        if(f2.r.status && f2.r.data.key == key){
+            fclose(f);
+            return second_level_position;
+        }
+        else {
+            fclose(f);
+            return -1;
+        }
+    }
+}
+
+//Query if there is a record with the corresponding key
+void consult_file(int key){
+    int pos = get_position(key);
+    if(pos == -1)
+        printf("chave nao encontrada: %d\n", key);
+    else{
+        printf("chave: %d\n", key);
+        FILE *f; //teste file no método que chama
+        if(!(f = fopen(MAIN_FILE,"rb"))) exit(-1);
+        fseek(f,pos,SEEK_SET);
+        second_level f2;
+        fread(&f2,sizeof(second_level),1,f);
+        printf("%s\n", f2.r.data.name);
+        printf("%d\n", f2.r.data.age);
+        fclose(f);
+    }
+}
+
+//Print the first level
+void print_first_level(){
+    FILE *f; //teste file no método que chama
+    if(!(f = fopen(MAIN_FILE,"rb"))) exit(-1);
+    fseek(f,0,SEEK_SET);
+    //Gets the a value of first level
+    int a;
+    fread(&a,sizeof(int),1,f);
+    //Gets the b value of second level
+    int b;
+    fread(&b,sizeof(int),1,f);
+    //Gets the prime value of first level
+    int prime;
+    fread(&prime,sizeof(int),1,f);
+    //Gets the m value of first level
+    int m;
+    fread(&m,sizeof(int),1,f);
+    printf("hashing perfeito: primeiro nivel\n");
+    printf("tamanho da tabela: %d\n", m);
+    printf("parametro a: %d\n", a);
+    printf("parametro b: %d\n", b);
+    printf("numero primo: %d\n", prime);
+
+    for(int i=0;i<m;i++){
+        int first_level_position = 4*sizeof(int) + i*sizeof(first_level);
+        fseek(f,first_level_position,SEEK_SET);
+        first_level f1;
+        fread(&f1,sizeof(first_level),1,f);
+        if(f1.second_level){
+            printf("%d: ", f1.index);
+            int second_level_size = f1.info[0];
+            for(int j=0;j<second_level_size;j++){
+                int second_level_position = 4*sizeof(int) + m*sizeof(first_level) + f1.second_level_offset*sizeof(second_level) + j*sizeof(second_level);
+                fseek(f,second_level_position,SEEK_SET);
+                second_level f2;
+                fread(&f2,sizeof(second_level),1,f);
+                if(f2.r.status)
+                    printf("%d ", f2.r.data.key);
+            }
+             printf("\n");
+        }
+    }
+}
