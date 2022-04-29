@@ -321,7 +321,7 @@ void create_second_level(int a, int b, int m, int p){
 
 //Gets the position of the register
 int get_position(int key){
-    FILE *f; //teste file no método que chama
+    FILE *f; 
     if(!(f = fopen(MAIN_FILE,"rb"))) exit(-1);
     fseek(f,0,SEEK_SET); 
     //Gets the a value of first level
@@ -383,7 +383,7 @@ void consult_file(int key){
         printf("chave nao encontrada: %d\n", key);
     else{
         printf("chave: %d\n", key);
-        FILE *f; //teste file no método que chama
+        FILE *f; 
         if(!(f = fopen(MAIN_FILE,"rb"))) exit(-1);
         fseek(f,pos,SEEK_SET);
         second_level f2;
@@ -396,7 +396,7 @@ void consult_file(int key){
 
 //Print the first level
 void print_first_level(){
-    FILE *f; //teste file no método que chama
+    FILE *f; 
     if(!(f = fopen(MAIN_FILE,"rb"))) exit(-1);
     fseek(f,0,SEEK_SET);
     //Gets the a value of first level
@@ -435,5 +435,62 @@ void print_first_level(){
             }
              printf("\n");
         }
+    }
+}
+
+//Print the second level
+void print_second_level(int index){
+    FILE *f; 
+    if(!(f = fopen(MAIN_FILE,"rb"))) exit(-1);
+    fseek(f,0,SEEK_SET);
+    //Gets the a value of first level
+    int a;
+    fread(&a,sizeof(int),1,f);
+    //Gets the b value of second level
+    int b;
+    fread(&b,sizeof(int),1,f);
+    //Gets the prime value of first level
+    int prime;
+    fread(&prime,sizeof(int),1,f);
+    //Gets the m value of first level
+    int m;
+    fread(&m,sizeof(int),1,f);
+    int first_level_position = 4*sizeof(int) + index*sizeof(first_level);
+    fseek(f,first_level_position,SEEK_SET);
+    first_level f1;
+    fread(&f1,sizeof(first_level),1,f);
+    printf("hashing perfeito: segundo nivel - indice: %d\n", f1.index);
+    printf("tamanho da tabela: %d\n", f1.info[0]);
+    printf("parametro a: %d\n", f1.info[1]);
+    printf("parametro b: %d\n", f1.info[2]);
+    printf("numero primo: %d\n", prime);
+    if(f1.second_level){
+        int second_level_size = f1.info[0];
+        for(int j=0;j<second_level_size;j++){
+            int second_level_position = 4*sizeof(int) + m*sizeof(first_level) + f1.second_level_offset*sizeof(second_level) + j*sizeof(second_level);
+            fseek(f,second_level_position,SEEK_SET);
+            second_level f2;
+            fread(&f2,sizeof(second_level),1,f);
+            if(f2.r.status)
+                printf("%d: %d\n", f2.index ,f2.r.data.key);
+        }
+    }
+}
+
+//Print for every index that has at least one key
+void print_full_second_level(){
+    FILE *f; 
+    if(!(f = fopen(MAIN_FILE,"rb"))) exit(-1);
+    fseek(f,3*sizeof(int),SEEK_SET);
+    //Gets the m value of first level
+    int m;
+    fread(&m,sizeof(int),1,f);
+    for(int i=0;i<m;i++){
+        int first_level_position = 4*sizeof(int) + i*sizeof(first_level);
+        fseek(f,first_level_position,SEEK_SET);
+        first_level f1;
+        fread(&f1,sizeof(first_level),1,f);
+        if(f1.second_level)
+            print_second_level(i);
     }
 }

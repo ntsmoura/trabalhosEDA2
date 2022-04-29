@@ -23,5 +23,7 @@ File: file_manager.h
     void create_second_level(int a, int b, int m, int p); //Create second level structure
     void consult_file(int key);
     void print_first_level();
+    void print_second_level(int index);
+    void print_full_second_level();
 
 #endif

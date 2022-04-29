@@ -15,7 +15,7 @@ int main(){
     char c = '@'; 
     int m;
     //FILE *f;
-    int key, age;
+    int key, age, index;
     char name[MAXNAMESIZE];
 
     while(c!='e'){
@@ -49,6 +49,16 @@ int main(){
             break;
             case 'p':{
                 print_first_level();
+            }
+            break;
+            case 's':{
+                scanf("%d",&index); //sempre válido
+                print_second_level(index);
+            }
+            break;
+            case 'h':{
+                print_first_level();
+                print_full_second_level();
             }
             break;
             case 'e':{
