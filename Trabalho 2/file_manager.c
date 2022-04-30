@@ -96,6 +96,7 @@ void create_temporary_vector_file(){
 
 //Return the record from a defined position in data "vector" file
 record return_vector_record(int position){
+
     FILE *f;
     if(!(f = fopen(TEMPORARY_DATA_VECTOR_FILE,"r"))) exit(-1);
     fseek(f,position*sizeof(record),SEEK_SET);
@@ -259,7 +260,7 @@ void create_second_level(int a, int b, int m, int p){
         int a1=0,b1=0;
         int m1 = f1_size*f1_size;
         
-        //Way to set fixed A1 and B1 indexes, to debug purpose only
+        //Way to set fixed a' and b' indexes, to debug purpose only
         //scanf("%d %d",&a1,&b1);
         if (m1 == 1){
             a1 = 0;

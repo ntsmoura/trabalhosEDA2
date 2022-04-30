@@ -70,12 +70,13 @@ int main(){
             case 'e':{
             }
             break;
+            /* For debug purpose only
             case '*':{
                //print_temporary_file(m);
                //printf("\n");
                print_structure();
                //printf("\n");
-            }
+            }*/
             break;
         }
     }
