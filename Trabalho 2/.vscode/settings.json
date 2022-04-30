@@ -1,6 +1,7 @@
 {
   "files.associations": {
     "stdio.h": "c",
-    "file_manager.h": "c"
+    "file_manager.h": "c",
+    "structures.h": "c"
   }
 }

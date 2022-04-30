@@ -31,15 +31,17 @@ int main(){
                     scanf("%d",&age);
                     insert_temporary_file(key,name,age);
                 }
-                srand(time(NULL)); //Set seed of rand to current time
+                //Set seed of rand to current time
+                srand(time(NULL)); 
                 int a = random_number(1,PRIME-1);
                 int b = random_number(0,PRIME-1);
                 //int a = 3;
                 //int b = 42;
                 calculate_elements_first_level(a,b,PRIME,m);
-                create_file(a,b,m);
+                create_file(a,b,PRIME,m);
                 create_second_level(a,b,m,PRIME);
                 delete_temporary_files();
+                printf("estrutura de hashing perfeito criada\n");
             }
             break;
             case 'c':{

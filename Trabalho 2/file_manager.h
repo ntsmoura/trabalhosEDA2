@@ -9,9 +9,9 @@ File: file_manager.h
 #define _H_FILE
 
     #include <stdbool.h>
-    #include "record.h"
+    #include "structures.h"
 
-    void create_file(int a, int b, int m); //Create records file
+    void create_file(int a, int b,int p, int m); //Create main file
     int random_number(int min, int max); //Generate random number between [min,max]
     void print_structure(); //Print file content(for development and debug process only)
     void create_temporary_file();  //Create temporary file to store data

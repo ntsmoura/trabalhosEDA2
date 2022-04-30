@@ -7,7 +7,7 @@ File: file_manager.c
 
 #include<stdio.h>
 #include<stdlib.h>
-#include "record.h"
+#include "structures.h"
 #include <string.h>
 
 #define MAIN_FILE  "records.dat"
@@ -54,16 +54,15 @@ void print_structure(){
     fclose(f);
 }
 
-//Create a file if it doesn't exist
-void create_file(int a, int b, int m){
+//Create the main file if it doesn't exist
+void create_file(int a, int b, int p, int m){
 
     FILE *f;
 
 	if(!(f = fopen(MAIN_FILE,"wb+"))) exit(-1);
     fwrite(&a,sizeof(int),1,f);
     fwrite(&b,sizeof(int),1,f);
-    int prime = PRIME;
-    fwrite(&prime,sizeof(int),1,f);
+    fwrite(&p,sizeof(int),1,f);
     fwrite(&m,sizeof(int),1,f);
     first_level f1;
     int i;
@@ -88,14 +87,14 @@ void create_temporary_file(){
     fclose(f);
 }
 
-//Create temporary file for data vector
+//Create temporary data "vector" file
 void create_temporary_vector_file(){
     FILE *f;
     if(!(f = fopen(TEMPORARY_DATA_VECTOR_FILE,"wb+"))) exit(-1);
     fclose(f);
 }
 
-//Return the record from a defined position in data vector file
+//Return the record from a defined position in data "vector" file
 record return_vector_record(int position){
     FILE *f;
     if(!(f = fopen(TEMPORARY_DATA_VECTOR_FILE,"r"))) exit(-1);
@@ -106,7 +105,7 @@ record return_vector_record(int position){
     return r;
 }
 
-//Insert element inside data vector file
+//Insert record inside data "vector" file
 void insert_vector_record(record r){
     FILE *f;
     if(!(f = fopen(TEMPORARY_DATA_VECTOR_FILE,"rb+"))) exit(-1);
@@ -115,7 +114,7 @@ void insert_vector_record(record r){
     fclose(f);
 }
 
-//Reset every value to 0 in secondary collision detection vector
+//Reset every value to 0 in secondary collision detection "vector"
 void reset_vector_collision_flags(int numbers, int m){
     FILE *f;
     if(!(f = fopen(TEMPORARY_DATA_VECTOR_FILE,"rb+"))) exit(-1);
@@ -181,7 +180,7 @@ void print_temporary_file(int m){
     
 }
 
-//Delete the temporary file
+//Delete the temporary files
 void delete_temporary_files(){
     if(remove(TEMPORARY_DATA_FILE) || remove(TEMPORARY_DATA_VECTOR_FILE)) exit(-1);
 }
@@ -214,7 +213,8 @@ void calculate_elements_first_level(int a,int b,int p,int m){
     fclose(f);
 }
 
-//Find first level elements of each index
+//Find first level elements of given first level 
+//After find each element stores them in temporary data "vector"
 void first_level_elements(first_level f1, int a, int b, int p, int m, int* f1_size){
     create_temporary_vector_file();
     FILE *f;
@@ -242,80 +242,85 @@ void first_level_elements(first_level f1, int a, int b, int p, int m, int* f1_si
 }
 
 
-//Create second level structure
+//Create second level structs in main file
+//Consults every first level structure and try to create a corresponding second level (if necessary)
+//Try to find a' and b' indexes for each second level avoiding collisions
 void create_second_level(int a, int b, int m, int p){
     FILE *f;
     if(!(f = fopen(MAIN_FILE,"rb+"))) exit(-1);
     int second_level_actual_offset = 0;
-        for(int i = 0; i< m; i++){
-            int position = 4*sizeof(int) + i*sizeof(first_level);
-            fseek(f,position,SEEK_SET);
-            first_level f1;
-            fread(&f1,sizeof(first_level),1,f);
-            int f1_size;
-            first_level_elements(f1,a,b,p,m, &f1_size);
-            int a1=0,b1=0;
-            int m1 = f1_size*f1_size;
-            
-            //Way to set fixed A1 and B1 indexes, to debug purpose only
-            //scanf("%d %d",&a1,&b1);
-            if (m1 == 1){
-                a1 = 0;
-                b1 = 0;
-            }
-            else if(m1 > 1){
-                int found = 0;
-                while(!found){
-                    found = 1;
-                    reset_vector_collision_flags(f1_size,m1);
-                    a1 = random_number(1,PRIME-1);
-                    b1 = random_number(0,PRIME-1);
-                    for(int j = 0; j<f1_size;j++){
-                        int key = return_vector_record(j).data.key;
-                        int result = universal_hashing(key,a1,b1,p,m1);
-                        if(return_vector_collision_flag(f1_size,result) == 1) {
-                            found = 0;
-                            break;
-                        }
-                        else insert_vector_collision_flag(f1_size,result);
+    for(int i = 0; i< m; i++){
+        int position = 4*sizeof(int) + i*sizeof(first_level);
+        fseek(f,position,SEEK_SET);
+        first_level f1;
+        fread(&f1,sizeof(first_level),1,f);
+        int f1_size;
+        first_level_elements(f1,a,b,p,m, &f1_size);
+        int a1=0,b1=0;
+        int m1 = f1_size*f1_size;
+        
+        //Way to set fixed A1 and B1 indexes, to debug purpose only
+        //scanf("%d %d",&a1,&b1);
+        if (m1 == 1){
+            a1 = 0;
+            b1 = 0;
+        }
+        else if(m1 > 1){
+            int found = 0;
+            //If found = 1 that means the program found a' and b' that avoids collision
+            //Set found = 0 if the program found any collision
+            while(!found){
+                found = 1;
+                reset_vector_collision_flags(f1_size,m1);
+                a1 = random_number(1,p-1);
+                b1 = random_number(0,p-1);
+                for(int j = 0; j<f1_size;j++){
+                    int key = return_vector_record(j).data.key;
+                    int result = universal_hashing(key,a1,b1,p,m1);
+                    if(return_vector_collision_flag(f1_size,result) == 1) {
+                        found = 0;
+                        break;
                     }
+                    else insert_vector_collision_flag(f1_size,result);
                 }
             }
-            f1.info[0] = m1;
-            f1.info[1] = a1;
-            f1.info[2] = b1;
-            if(m1 > 0){ 
-                f1.second_level = true;
-                f1.second_level_offset = second_level_actual_offset;
-                second_level_actual_offset+=m1;
-            }
-            fseek(f,position,SEEK_SET);
-            fwrite(&f1,sizeof(first_level),1,f);
-            fseek(f,0,SEEK_END);
-            for (int k = 0; k<m1;k++){
-                second_level f2;
-                record r;
-                r.status = false;
-                f2.first_level_index = f1.index;
-                f2.index = k;
-                f2.r = r;
-                fwrite(&f2,sizeof(second_level),1,f);
-            }
-            for(int k = 0; k < f1_size; k++){
-                record r1 = return_vector_record(k);
-                int result = universal_hashing(r1.data.key,a1,b1,p,m1);
-                int second_level_position = 4*sizeof(int) + m*sizeof(first_level) + f1.second_level_offset*sizeof(second_level) + result*sizeof(second_level);
-                second_level f2;
-                fseek(f,second_level_position,SEEK_SET);
-                fread(&f2,sizeof(second_level),1,f);
-                f2.r.status = true;
-                f2.r.data.key = r1.data.key;
-                strcpy(f2.r.data.name,r1.data.name);
-                f2.r.data.age = r1.data.age;
-                fseek(f,second_level_position,SEEK_SET);
-                fwrite(&f2,sizeof(second_level),1,f);
-            }
         }
+        //Updates first level information and creates the corresponding second level
+        f1.info[0] = m1;
+        f1.info[1] = a1;
+        f1.info[2] = b1;
+        if(m1 > 0){ 
+            f1.second_level = true;
+            f1.second_level_offset = second_level_actual_offset;
+            second_level_actual_offset+=m1;
+        }
+        fseek(f,position,SEEK_SET);
+        fwrite(&f1,sizeof(first_level),1,f);
+        fseek(f,0,SEEK_END);
+        for (int k = 0; k<m1;k++){
+            second_level f2;
+            record r;
+            r.status = false;
+            f2.first_level_index = f1.index;
+            f2.index = k;
+            f2.r = r;
+            fwrite(&f2,sizeof(second_level),1,f);
+        }
+        for(int k = 0; k < f1_size; k++){
+            record r1 = return_vector_record(k);
+            int result = universal_hashing(r1.data.key,a1,b1,p,m1);
+            int second_level_position = 4*sizeof(int) + m*sizeof(first_level) + f1.second_level_offset*sizeof(second_level) + result*sizeof(second_level);
+            second_level f2;
+            fseek(f,second_level_position,SEEK_SET);
+            fread(&f2,sizeof(second_level),1,f);
+            f2.r.status = true;
+            f2.r.data.key = r1.data.key;
+            strcpy(f2.r.data.name,r1.data.name);
+            f2.r.data.age = r1.data.age;
+            fseek(f,second_level_position,SEEK_SET);
+            fwrite(&f2,sizeof(second_level),1,f);
+        }
+    }
     fclose(f);
 }
 
@@ -365,7 +370,7 @@ int get_position(int key){
         }
     }
     else{
-        int result = universal_hashing(key,f1.info,b,prime,m);
+        int result = universal_hashing(key,f1.info[1],f1.info[2],prime,f1.info[0]);
         int second_level_position = 4*sizeof(int) + m*sizeof(first_level) + f1.second_level_offset*sizeof(second_level) + result*sizeof(second_level);
         fseek(f,second_level_position,SEEK_SET);
         second_level f2;
@@ -429,7 +434,7 @@ void print_first_level(){
         first_level f1;
         fread(&f1,sizeof(first_level),1,f);
         if(f1.second_level){
-            printf("%d: ", f1.index);
+            printf("%d:", f1.index);
             int second_level_size = f1.info[0];
             for(int j=0;j<second_level_size;j++){
                 int second_level_position = 4*sizeof(int) + m*sizeof(first_level) + f1.second_level_offset*sizeof(second_level) + j*sizeof(second_level);
@@ -437,7 +442,7 @@ void print_first_level(){
                 second_level f2;
                 fread(&f2,sizeof(second_level),1,f);
                 if(f2.r.status)
-                    printf("%d ", f2.r.data.key);
+                    printf(" %d", f2.r.data.key);
             }
              printf("\n");
         }

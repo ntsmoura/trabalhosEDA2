@@ -2,7 +2,7 @@
 Author: Caio Nery e Natan Moura
 Teacher: Flávio Assis Silva
 Class: MATA54
-File: record.h
+File: structures.h
 */
 
 #include<stdbool.h>
