@@ -518,9 +518,6 @@ void number_of_functions(){
     //Gets the prime value of first level
     int prime;
     fread(&prime,sizeof(int),1,f);
-    //Gets the m value of first level
-    int m;
-    fread(&m,sizeof(int),1,f);
 
     int number_of_functions = prime * (prime-1);
     printf("%d\n", number_of_functions);
