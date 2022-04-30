@@ -8,7 +8,7 @@ File: structures.h
 #include<stdbool.h>
 
 #define MAXNAMESIZE 21 //21 because the string contain 20 valid characters and 1 NULL carachter 
-#define PRIME 101 //since bigger input key is 100 we defined  101 as our prime number
+#define PRIME 101 //since biggest input key is 100 we defined  101 as our prime number
 
 //Struct for user data
 typedef struct {
