@@ -1,0 +1,9 @@
+file_manager
+records
+./vscode
+in.txt
+out.txt
+main.o
+file_manager.o
+file_manager.exe
+*.dat
