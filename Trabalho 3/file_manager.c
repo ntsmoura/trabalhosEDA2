@@ -54,7 +54,7 @@ void insert_node(record r){
 	int found = 0;
 	int level = 1;
 	int actual_position = 2*sizeof(int);
-	bool is_left_son;
+	bool is_left_son = false;
 	while(!found){
 		level = level + 1;
 		if(actual.level%2!=0) {
