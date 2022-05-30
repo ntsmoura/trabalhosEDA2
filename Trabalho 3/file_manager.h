@@ -11,9 +11,13 @@ File: file_manager.h
     #include <stdbool.h>
     #include "structures.h"
 
-    void create_file(); //Creates the main file
-    void create_root(record r); //Creates the root of the tree
-    void print_nodes(int number); //for debug purposes only
+    void create_file(); //Create the main file
+    void create_root(record r); //Create the root of the tree
+    void print_nodes(); //for debug purposes only
+    void print_linked_pages();  //for debug purposes only
     void insert_node(record r); //insert nodes in the k-d tree
+    void insert_empty_pages(); //insert empty pages in the k-d tree
+    void insert_into_page(record r, int page_node_position);//insert record into a not full page
+    
 
 #endif
