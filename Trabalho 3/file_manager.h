@@ -18,6 +18,7 @@ File: file_manager.h
     void insert_node(record r); //insert nodes in the k-d tree
     void insert_empty_pages(); //insert empty pages in the k-d tree
     void insert_into_page(record r, int page_node_position);//insert record into a not full page
+    void insert_record(record r);//insert record into the correct page
     
 
 #endif

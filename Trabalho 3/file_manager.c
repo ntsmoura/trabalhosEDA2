@@ -24,7 +24,7 @@ void create_file(){
 	fclose(f);
 }
 
-//Create k-d tree structure
+//Create k-d tree root
 void create_root(record r){
 	FILE *f;
 	if(!(f = fopen(MAIN_FILE,"rb+"))) exit(-1);
@@ -45,26 +45,23 @@ void create_root(record r){
 	fclose(f);
 }
 
-
-//Insert key nodes in k-d tree
-void insert_node(record r){
+//Search for the leaf node to insert node or record
+int search_node(record r, bool* is_left_son, int* level){
 	FILE *f;
 	if(!(f = fopen(MAIN_FILE,"rb+"))) exit(-1);
 	fseek(f,2*sizeof(int),SEEK_SET);
 	node actual;
 	fread(&actual,sizeof(node),1,f);
 	int found = 0;
-	int level = 1;
 	int actual_position = 2*sizeof(int);
-	bool is_left_son = false;
 	while(!found){
-		level = level + 1;
+		*level+=1;
 		if(actual.level%2!=0) {
 			int result = strcmp(r.data.name,actual.name);
 			if(result <= 0){
 				if(actual.left_son == -1){
 					found = 1;
-					is_left_son = true;
+					*is_left_son = true;
 				}
 				else {
 					actual_position = 2*sizeof(int)+actual.left_son*sizeof(node);
@@ -86,7 +83,7 @@ void insert_node(record r){
 			if(r.data.year <= actual.year){
 				if(actual.left_son == -1){
 					found = 1;
-					is_left_son = true;
+					*is_left_son = true;
 				}
 				else {
 					actual_position = 2*sizeof(int)+actual.left_son*sizeof(node);
@@ -106,10 +103,27 @@ void insert_node(record r){
 			}
 		}
 	}
-	fseek(f,0,SEEK_SET);
+	fclose(f);
+	return actual_position;
+}
+
+
+//Insert key nodes in k-d tree
+void insert_node(record r){
+	bool* is_left_son = malloc(sizeof(bool));
+	int* level = malloc(sizeof(int));
+	*level = 1;
+	*is_left_son = false;
+	int actual_position = search_node(r,is_left_son,level);
 	int number;
+	node actual;
+	FILE *f;
+	if(!(f = fopen(MAIN_FILE,"rb+"))) exit(-1);
+	fseek(f,0,SEEK_SET);
 	fread(&number,sizeof(int),1,f);
-	if(is_left_son) actual.left_son = number;
+	fseek(f,actual_position,SEEK_SET);
+	fread(&actual,sizeof(node),1,f);
+	if(*is_left_son) actual.left_son = number;
 	else actual.right_son = number;
 	fseek(f,actual_position,SEEK_SET);
 	fwrite(&actual,sizeof(node),1,f);
@@ -118,8 +132,8 @@ void insert_node(record r){
 	new_node.is_page = false;
 	new_node.left_son = -1;
 	new_node.right_son = -1;
-	new_node.level = level;
-	if(level%2!=0) strcpy(new_node.name,r.data.name);
+	new_node.level = *level;
+	if(*level%2!=0) strcpy(new_node.name,r.data.name);
 	else new_node.year = r.data.year;
 	fwrite(&new_node,sizeof(node),1,f);
 
@@ -127,10 +141,12 @@ void insert_node(record r){
 	fseek(f,0,SEEK_SET);
 	fwrite(&number,sizeof(int),1,f);
 
-
+	free(level);
+	free(is_left_son);
 	fclose(f);
 
 }
+
 
 //Insert empty pages and link them to respective parents
 void insert_empty_pages(){
@@ -174,6 +190,7 @@ void insert_empty_pages(){
 
 }
 
+
 //Try to insert one record inside a page, if the page is full try to find linked pages with rooms, creates a new linked page if necessary
 void insert_into_page(record r, int page_node_position){
 	int number, linked_page_number, found,linked_page_position;
@@ -195,6 +212,7 @@ void insert_into_page(record r, int page_node_position){
 		n.p = p;
 		fseek(f,page_node_position,SEEK_SET);
 		fwrite(&n,sizeof(node),1,f);
+		
 	} 
 	else if(p.linked_page == -1){
 		page new_page;
@@ -207,7 +225,7 @@ void insert_into_page(record r, int page_node_position){
 		fseek(f,page_node_position,SEEK_SET);
 		fwrite(&n,sizeof(node),1,f);
 		fseek(f,1*sizeof(int),SEEK_SET);
-		fwrite(&linked_page_number,sizeof(page),1,f);
+		fwrite(&linked_page_number,sizeof(int),1,f);
 		fseek(f,0,SEEK_END);
 		fwrite(&new_page,sizeof(page),1,f);
 		found = 1;
@@ -235,7 +253,7 @@ void insert_into_page(record r, int page_node_position){
 					fseek(f,linked_page_position,SEEK_SET);
 					fwrite(&p,sizeof(page),1,f);
 					fseek(f,1*sizeof(int),SEEK_SET);
-					fwrite(&linked_page_number,sizeof(page),1,f);
+					fwrite(&linked_page_number,sizeof(int),1,f);
 					fseek(f,0,SEEK_END);
 					fwrite(&new_page,sizeof(page),1,f);
 					found = 1;
@@ -247,12 +265,29 @@ void insert_into_page(record r, int page_node_position){
 
 }
 
+//Print page information
+void print_page(page p){
+	printf("PAGE - QTY:%d, LINKED PAGE: %d, RECORDS INFO: ",p.qty,p.linked_page);
+	for(int i = 0; i<p.qty;i++)printf("(%s,%u) ",p.records[i].data.name,p.records[i].data.year);
+	printf("\n");
+}
+
+//Insert record into page finding the correct page and using isert_into_page
+void insert_record(record r){
+	bool* is_left_son = malloc(sizeof(bool));
+	int* level = malloc(sizeof(int));
+	*level = 1;
+	*is_left_son = false;
+	int page_position = search_node(r,is_left_son,level);
+	insert_into_page(r, page_position);
+}
+
 //for debug purposes only
 void print_node(node n){
 	if(!n.is_page){
 		if(n.level%2!=0) printf("LEVEL: %d, IS PAGE?: %d, LEFT SON: %d, RIGHT SON: %d, VALUE: %s\n",n.level,n.is_page,n.left_son,n.right_son,n.name);
 		else printf("LEVEL: %d, IS PAGE?: %d, LEFT SON: %d, RIGHT SON: %d, VALUE: %d\n",n.level,n.is_page,n.left_son,n.right_son,n.year);
-	} else printf("PAGE - QTY:%d, LINKED PAGE: %d, RECORDS NAMES: %s %s %s\n",n.p.qty,n.p.linked_page,n.p.records[0].data.name,n.p.records[1].data.name,n.p.records[2].data.name);
+	} else print_page(n.p);
 }
 
 //for debug purposes only
@@ -282,6 +317,6 @@ void print_linked_pages(){
 	for(int i = 0; i<linked_pages_number;i++){
 		page p;
 		fread(&p,sizeof(page),1,f);
-		printf("LINKED PAGE - QTY:%d, LINKED PAGE: %d, RECORDS NAMES: %s %s %s\n",p.qty,p.linked_page,p.records[0].data.name,p.records[1].data.name,p.records[2].data.name);
+		print_page(p);
 	}
 }

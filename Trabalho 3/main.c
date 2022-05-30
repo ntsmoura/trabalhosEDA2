@@ -43,10 +43,7 @@ int main(){
             create_root(*records);
             for(int i = 1; i<n;i++) insert_node(*(records+i));
             insert_empty_pages();
-            insert_into_page(*records,2*sizeof(int)+11*sizeof(node));
-            insert_into_page(*(records+1),2*sizeof(int)+11*sizeof(node));
-            insert_into_page(*(records+2),2*sizeof(int)+11*sizeof(node));
-            insert_into_page(*(records+3),2*sizeof(int)+11*sizeof(node));
+            for(int i = 1; i<n;i++) insert_record(*(records+i));
             print_nodes();
             print_linked_pages();
         }
