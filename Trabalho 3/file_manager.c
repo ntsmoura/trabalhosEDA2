@@ -265,6 +265,50 @@ void insert_into_page(record r, int page_node_position){
 
 }
 
+//print index value
+void print_index_value(node n){
+    if(n.level%2==0) printf(" %u ",n.year);
+	else printf(" %s ",n.name);
+}
+
+
+//load k-d tree indexes into a vector
+node* load_indexes_vector(int *indexes_size){
+	FILE *f;
+	int number;
+	if(!(f = fopen(MAIN_FILE,"rb+"))) exit(-1);
+	fseek(f,0,SEEK_SET);
+	fread(&number,sizeof(int),1,f);
+	*indexes_size = number/2;
+	node* indexes = calloc(*indexes_size,sizeof(node));
+	fseek(f,2*sizeof(int),SEEK_SET);
+	for(int i = 0; i<*indexes_size;i++){
+		node n;
+		fread(&n,sizeof(node),1,f);
+		*(indexes+i) = n;
+	}
+	return indexes;
+}
+
+//Print k-d tree indexes
+void print_indexes(int position, node* indexes, int indexes_size){
+	if((indexes+position)->is_page) return;
+	print_indexes((indexes+position)->left_son,indexes,indexes_size);
+	if((indexes+position)->level%2==0) printf("ano:");
+	else printf("nome:");
+	print_index_value(*(indexes+position));
+	printf(" fesq: ");
+	int fesq = (indexes+position)->left_son;
+	if(fesq < indexes_size) print_index_value(*(indexes+fesq));
+	else printf("pagina");
+	printf(" fdir: ");
+	int fdir = (indexes+position)->right_son;
+	if(fdir < indexes_size) print_index_value(*(indexes+fdir));
+	else printf("pagina");
+	printf("\n");
+	print_indexes((indexes+position)->right_son,indexes,indexes_size);
+}
+
 //Print page information
 void print_page(page p){
 	printf("PAGE - QTY:%d, LINKED PAGE: %d, RECORDS INFO: ",p.qty,p.linked_page);

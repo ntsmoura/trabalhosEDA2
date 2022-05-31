@@ -51,12 +51,33 @@ int main(){
             scanf("%c",&c);
             switch (c){
                 case 'i':{
+                    record r;
+                    r.status = true;
+                    getchar();
+                    scanf("%20[^\n]", r.data.name);
+                    getchar();
+                    scanf("%20[^\n]", r.data.title);
+                    getchar();
+                    scanf("%u",&r.data.year);
+                    getchar();
+                    scanf("%20[^\n]", r.data.file);
+                    getchar();
+                    insert_record(r);
+                    print_nodes();
+                    print_linked_pages();
                 }
                 break;
                 case 'p':{
                 }
                 break;
                 case 'e':{
+                }
+                break;
+                case 't':{
+                    int* indexes_size = malloc(sizeof(int));
+                    node* indexes = load_indexes_vector(indexes_size);
+                    print_indexes(0,indexes,*indexes_size);
+                    free(indexes);
                 }
                 break;
             }
