@@ -43,9 +43,8 @@ int main(){
             create_root(*records);
             for(int i = 1; i<n;i++) insert_node(*(records+i));
             insert_empty_pages();
-            for(int i = 1; i<n;i++) insert_record(*(records+i));
-            print_nodes();
-            print_linked_pages();
+            for(int i = 0; i<n;i++) insert_record(*(records+i));
+            printf("arvore k-d gerada\n");
         }
         else{
             scanf("%c",&c);
@@ -63,11 +62,22 @@ int main(){
                     scanf("%20[^\n]", r.data.file);
                     getchar();
                     insert_record(r);
-                    print_nodes();
-                    print_linked_pages();
+                    printf("inserido registro com nome: %s\n",r.data.name);
                 }
                 break;
                 case 'p':{
+                    int page_index;
+                    int* indexes_size = malloc(sizeof(int));
+                    int count = 0;
+                    int page_position = -1;
+                    bool found = false;
+                    node* indexes = load_indexes_vector(indexes_size);
+                    scanf("%d",&page_index);
+                    find_page(0,&count,page_index,indexes,*indexes_size,&found, &page_position);
+                    print_page(page_position);
+                    free(indexes_size);
+                    free(indexes);
+                    
                 }
                 break;
                 case 'e':{
@@ -78,6 +88,12 @@ int main(){
                     node* indexes = load_indexes_vector(indexes_size);
                     print_indexes(0,indexes,*indexes_size);
                     free(indexes);
+                }
+                break;
+                //for debug purposes only
+                case '*':{
+                    print_nodes();
+                    print_linked_pages();
                 }
                 break;
             }

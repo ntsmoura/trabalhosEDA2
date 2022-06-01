@@ -265,6 +265,16 @@ void insert_into_page(record r, int page_node_position){
 
 }
 
+//Insert record into page finding the correct page and using isert_into_page
+void insert_record(record r){
+	bool* is_left_son = malloc(sizeof(bool));
+	int* level = malloc(sizeof(int));
+	*level = 1;
+	*is_left_son = false;
+	int page_position = search_node(r,is_left_son,level);
+	insert_into_page(r, page_position);
+}
+
 //print index value
 void print_index_value(node n){
     if(n.level%2==0) printf(" %u ",n.year);
@@ -292,46 +302,74 @@ node* load_indexes_vector(int *indexes_size){
 
 //Print k-d tree indexes
 void print_indexes(int position, node* indexes, int indexes_size){
-	if((indexes+position)->is_page) return;
-	print_indexes((indexes+position)->left_son,indexes,indexes_size);
-	if((indexes+position)->level%2==0) printf("ano:");
-	else printf("nome:");
-	print_index_value(*(indexes+position));
-	printf(" fesq: ");
-	int fesq = (indexes+position)->left_son;
-	if(fesq < indexes_size) print_index_value(*(indexes+fesq));
-	else printf("pagina");
-	printf(" fdir: ");
-	int fdir = (indexes+position)->right_son;
-	if(fdir < indexes_size) print_index_value(*(indexes+fdir));
-	else printf("pagina");
-	printf("\n");
-	print_indexes((indexes+position)->right_son,indexes,indexes_size);
+	if(!(position>=indexes_size)){
+		print_indexes((indexes+position)->left_son,indexes,indexes_size);
+		if((indexes+position)->level%2==0) printf("ano:");
+		else printf("nome:");
+		print_index_value(*(indexes+position));
+		printf("fesq:");
+		int fesq = (indexes+position)->left_son;
+		if(fesq < indexes_size) print_index_value(*(indexes+fesq));
+		else printf(" pagina ");
+		printf("fdir:");
+		int fdir = (indexes+position)->right_son;
+		if(fdir < indexes_size) print_index_value(*(indexes+fdir));
+		else printf(" pagina ");
+		printf("\n");
+		print_indexes((indexes+position)->right_son,indexes,indexes_size);
+	}
 }
 
-//Print page information
-void print_page(page p){
+//Find the page with the correspondent index
+void find_page(int position, int* count, int page_index, node* indexes, int indexes_size, bool* found, int* page_position){
+	if(position>=indexes_size){
+		if(*found == false && *count == page_index){
+			*found = true;
+			*page_position = position;
+		}
+		*count += 1;
+	} else if(!(*found)){
+		find_page((indexes+position)->left_son,count, page_index, indexes, indexes_size, found, page_position);
+		find_page((indexes+position)->right_son,count, page_index, indexes, indexes_size, found, page_position);
+	}
+}
+
+//Print the content of the page and all the pages linked to it
+void print_page(int page_node_index){
+	FILE *f;
+	node n;
+	int number;
+	if(!(f = fopen(MAIN_FILE,"rb+"))) exit(-1);
+	fseek(f,0,SEEK_SET);
+	fread(&number,sizeof(int),1,f);
+	fseek(f,2*sizeof(int)+page_node_index*sizeof(node),SEEK_SET);
+	fread(&n,sizeof(node),1,f);
+	page p = n.p;
+	bool stop_print = false;
+	while(!stop_print){
+		for(int i = 0; i<p.qty;i++)printf("%s\n%s\n%u\n%s\n",p.records[i].data.name,p.records[i].data.title,p.records[i].data.year,p.records[i].data.file);
+		if(p.linked_page !=-1){
+			fseek(f,2*sizeof(int)+number*sizeof(node)+p.linked_page*sizeof(page),SEEK_SET);
+			fread(&p,sizeof(page),1,f);
+		} else stop_print = true;
+	}
+}
+
+
+//Print page information for debug
+void print_page_debug(page p){
 	printf("PAGE - QTY:%d, LINKED PAGE: %d, RECORDS INFO: ",p.qty,p.linked_page);
 	for(int i = 0; i<p.qty;i++)printf("(%s,%u) ",p.records[i].data.name,p.records[i].data.year);
 	printf("\n");
 }
 
-//Insert record into page finding the correct page and using isert_into_page
-void insert_record(record r){
-	bool* is_left_son = malloc(sizeof(bool));
-	int* level = malloc(sizeof(int));
-	*level = 1;
-	*is_left_son = false;
-	int page_position = search_node(r,is_left_son,level);
-	insert_into_page(r, page_position);
-}
 
 //for debug purposes only
 void print_node(node n){
 	if(!n.is_page){
 		if(n.level%2!=0) printf("LEVEL: %d, IS PAGE?: %d, LEFT SON: %d, RIGHT SON: %d, VALUE: %s\n",n.level,n.is_page,n.left_son,n.right_son,n.name);
 		else printf("LEVEL: %d, IS PAGE?: %d, LEFT SON: %d, RIGHT SON: %d, VALUE: %d\n",n.level,n.is_page,n.left_son,n.right_son,n.year);
-	} else print_page(n.p);
+	} else print_page_debug(n.p);
 }
 
 //for debug purposes only
@@ -361,6 +399,6 @@ void print_linked_pages(){
 	for(int i = 0; i<linked_pages_number;i++){
 		page p;
 		fread(&p,sizeof(page),1,f);
-		print_page(p);
+		print_page_debug(p);
 	}
 }
