@@ -74,6 +74,7 @@ int main(){
                     node* indexes = load_indexes_vector(indexes_size);
                     scanf("%d",&page_index);
                     find_page(0,&count,page_index,indexes,*indexes_size,&found, &page_position);
+                    printf("pagina: %d\n",page_index);
                     print_page(page_position);
                     free(indexes_size);
                     free(indexes);
