@@ -297,6 +297,7 @@ node* load_indexes_vector(int *indexes_size){
 		fread(&n,sizeof(node),1,f);
 		*(indexes+i) = n;
 	}
+	fclose(f);
 	return indexes;
 }
 
@@ -353,6 +354,7 @@ void print_page(int page_node_index){
 			fread(&p,sizeof(page),1,f);
 		} else stop_print = true;
 	}
+	fclose(f);
 }
 
 
@@ -369,7 +371,10 @@ void print_node(node n){
 	if(!n.is_page){
 		if(n.level%2!=0) printf("LEVEL: %d, IS PAGE?: %d, LEFT SON: %d, RIGHT SON: %d, VALUE: %s\n",n.level,n.is_page,n.left_son,n.right_son,n.name);
 		else printf("LEVEL: %d, IS PAGE?: %d, LEFT SON: %d, RIGHT SON: %d, VALUE: %d\n",n.level,n.is_page,n.left_son,n.right_son,n.year);
-	} else print_page_debug(n.p);
+	} else{
+		printf("LEVEL: %d, IS PAGE?: %d, LEFT SON: %d, RIGHT SON: %d PAGE: ",n.level,n.is_page,n.left_son,n.right_son);
+		print_page_debug(n.p);
+	}
 }
 
 //for debug purposes only
@@ -385,6 +390,7 @@ void print_nodes(){
 		fread(&n,sizeof(node),1,f);
 		print_node(n);
 	}
+	fclose(f);
 }
 
 //for debug purposes only
@@ -401,4 +407,5 @@ void print_linked_pages(){
 		fread(&p,sizeof(page),1,f);
 		print_page_debug(p);
 	}
+	fclose(f);
 }
