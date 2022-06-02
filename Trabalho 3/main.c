@@ -39,7 +39,6 @@ int main(){
                 getchar();
                 *(records+i) = r;
             }
-            fclose(f);
             create_root(*records);
             for(int i = 1; i<n;i++) insert_node(*(records+i));
             insert_empty_pages();
@@ -79,6 +78,13 @@ int main(){
                     free(indexes_size);
                     free(indexes);
                     
+                }
+                break;
+                case 'c':{
+                    char name[MAXNAMESIZE];
+                    getchar();
+                    scanf("%20[^\n]", name);
+                    simple_search(name);
                 }
                 break;
                 case 'e':{

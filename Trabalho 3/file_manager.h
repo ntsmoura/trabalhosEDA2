@@ -23,6 +23,8 @@ File: file_manager.h
     node* load_indexes_vector(int* indexes_size); //load k-d tree indexes into a vector
     int find_page(int position, int* count, int page_index, node* indexes, int indexes_size, bool* found, int* page_position); //Find page node position
     void print_page(int page_node_index); //Print the specified page and all the linked ones
+    void simple_search(char name[MAXNAMESIZE]);
+    bool print_record_ss(page p, char name[MAXNAMESIZE]);
     
 
 #endif

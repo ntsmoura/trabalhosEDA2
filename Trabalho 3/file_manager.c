@@ -409,3 +409,40 @@ void print_linked_pages(){
 	}
 	fclose(f);
 }
+
+bool print_record_ss(page p, char name[MAXNAMESIZE]){
+	bool found = false;
+	for(int i = 0; i<p.qty;i++){
+		//printf("teste: %s --- %s\n", p.records[i].data.name, name);
+		if(strcmp(name, p.records[i].data.name) == 0){
+			printf("ENTROU\n");
+			printf("nome: %s\n", p.records[i].data.name);
+			printf("%s\n", p.records[i].data.title);
+			printf("%u\n", p.records[i].data.year);
+			printf("%s\n", p.records[i].data.file);
+			found = true;
+		}
+	}
+	return found;
+}
+
+void simple_search(char name[MAXNAMESIZE]){
+	int number;
+	FILE *f;
+	if(!(f = fopen(MAIN_FILE,"rb"))) exit(-1);
+	fseek(f,0,SEEK_SET);
+	fread(&number,sizeof(int),1,f);
+	fseek(f,2*sizeof(int),SEEK_SET);
+	bool found = false;
+	for(int i = 0; i<number;i++){
+		node n;
+		fread(&n,sizeof(node),1,f);
+		if(n.is_page){
+			if(print_record_ss(n.p, name))
+				found = true;
+		}
+	}
+	if(!found)
+		printf("nao foi encontrado registro com nome: %s\n", name);
+	fclose(f);
+}
