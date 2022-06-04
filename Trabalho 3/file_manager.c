@@ -477,7 +477,7 @@ void find_authors_in_range(FILE* f, node* actual, char name1[MAXNAMESIZE], char 
 		for(int i = 0; i<actual->p.qty;i++){
 			//imprime os records que se encontram no range
 			if(strcmp(name1, actual->p.records[i].data.name) <= 0 && strcmp(name2, actual->p.records[i].data.name) >= 0){
-				printf("nome: %s\n", actual->p.records[i].data.name);
+				printf("%s\n", actual->p.records[i].data.name);
 				printf("%s\n", actual->p.records[i].data.title);
 				printf("%u\n", actual->p.records[i].data.year);
 				printf("%s\n", actual->p.records[i].data.file);
@@ -499,7 +499,7 @@ void find_authors_in_range(FILE* f, node* actual, char name1[MAXNAMESIZE], char 
 				find_authors_in_range(f, &son, name1, name2);
 			}
 		}
-		else if(strcmp(name2, (actual)->name) <= 0){ //caso esteja no range, vai pros dois l
+		else if(strcmp(name2, (actual)->name) < 0){ //caso esteja no range, vai pros dois l
 			if(actual->left_son != -1){
 				fseek(f,2*sizeof(int) + (actual->left_son)*sizeof(node),SEEK_SET);
 				fread(&son,sizeof(node),1,f);
@@ -538,6 +538,77 @@ void range_author_search(char name1[MAXNAMESIZE], char name2[MAXNAMESIZE]){
 	fread(&root,sizeof(node),1,f);
 
 	find_authors_in_range(f, &root, name1, name2);
+
+	fclose(f);
+}
+
+//Find the pages in range of the years of realease and print the records
+void find_years_in_range(FILE* f, node* actual, unsigned int ano1, unsigned int ano2){
+	if(actual->is_page){
+		for(int i = 0; i<actual->p.qty;i++){
+			//imprime os records que se encontram no range
+			if(ano1 <= actual->p.records[i].data.year && ano2 >= actual->p.records[i].data.year){
+				printf("%s\n", actual->p.records[i].data.name);
+				printf("%s\n", actual->p.records[i].data.title);
+				printf("%u\n", actual->p.records[i].data.year);
+				printf("%s\n", actual->p.records[i].data.file);
+			}
+		}
+	}
+	
+	node son;
+	if(actual->level%2==0){
+		if(ano1 == actual->year || (ano1 < actual->year && ano2 > actual->year)) {
+			if(actual->left_son != -1){
+				fseek(f,2*sizeof(int) + (actual->left_son)*sizeof(node),SEEK_SET);
+				fread(&son,sizeof(node),1,f);
+				find_years_in_range(f, &son, ano1, ano2);
+			}
+			if(actual->right_son != -1){
+				fseek(f,2*sizeof(int) + (actual->right_son)*sizeof(node),SEEK_SET);
+				fread(&son,sizeof(node),1,f);
+				find_years_in_range(f, &son, ano1, ano2);
+			}
+		}
+		else if(ano2 < actual->year){
+			if(actual->left_son != -1){
+				fseek(f,2*sizeof(int) + (actual->left_son)*sizeof(node),SEEK_SET);
+				fread(&son,sizeof(node),1,f);
+				find_years_in_range(f, &son, ano1, ano2);
+			}
+		}
+		else if(ano1 > actual->year){
+			if(actual->right_son != -1){
+			fseek(f,2*sizeof(int) + (actual->right_son)*sizeof(node),SEEK_SET);
+			fread(&son,sizeof(node),1,f);
+			find_years_in_range(f, &son, ano1, ano2);
+			}	
+		}
+	}
+	else{
+		if(actual->left_son != -1){
+			fseek(f,2*sizeof(int) + (actual->left_son)*sizeof(node),SEEK_SET);
+			fread(&son,sizeof(node),1,f);
+			find_years_in_range(f, &son, ano1, ano2);
+		}
+		if(actual->right_son != -1){
+			fseek(f,2*sizeof(int) + (actual->right_son)*sizeof(node),SEEK_SET);
+			fread(&son,sizeof(node),1,f);
+			find_years_in_range(f, &son, ano1, ano2);
+		}		
+	}
+}
+
+//Find the pages in range of the years of release and print the records
+void range_year_search(unsigned int ano1, unsigned int ano2){
+	FILE *f;
+	if(!(f = fopen(MAIN_FILE,"rb+"))) exit(-1);
+
+	fseek(f,2*sizeof(int) + 0*sizeof(node),SEEK_SET);
+	node root;
+	fread(&root,sizeof(node),1,f);
+
+	find_years_in_range(f, &root, ano1, ano2);
 
 	fclose(f);
 }

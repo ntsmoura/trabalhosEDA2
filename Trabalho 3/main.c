@@ -97,6 +97,16 @@ int main(){
                     range_author_search(name1, name2);
                 }
                 break;
+                case 'a':{
+                    unsigned int ano1;
+                    getchar();
+                    scanf("%u", &ano1);
+                    unsigned int ano2;
+                    getchar();
+                    scanf("%u", &ano2);
+                    range_year_search(ano1, ano2);
+                }
+                break;
                 case 'e':{
                 }
                 break;

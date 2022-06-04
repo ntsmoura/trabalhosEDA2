@@ -26,6 +26,8 @@ File: file_manager.h
     void simple_search_name(char name[MAXNAMESIZE]);
     void find_author_simple(FILE* f, node* actual, bool* found, char name[MAXNAMESIZE]);
     void range_author_search(char name1[MAXNAMESIZE], char name2[MAXNAMESIZE]);
+    void range_year_search(unsigned int ano1, unsigned int ano2);
+    void find_years_in_range(FILE* f, node* actual, unsigned int ano1, unsigned int ano2);
     
 
 #endif
