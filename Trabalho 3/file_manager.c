@@ -499,7 +499,7 @@ void find_authors_in_range(FILE* f, node* actual, char name1[MAXNAMESIZE], char 
 					find_authors_in_range(f, &son, name1, name2);
 				}
 			}
-			else if(strcmp(name2, (actual)->name) < 0){
+			else if(strcmp(name2, (actual)->name) <= 0){
 				if(actual->left_son != -1){
 					fseek(f,2*sizeof(int) + (actual->left_son)*sizeof(node),SEEK_SET);
 					fread(&son,sizeof(node),1,f);
@@ -570,7 +570,7 @@ void find_years_in_range(FILE* f, node* actual, unsigned int ano1, unsigned int 
 					find_years_in_range(f, &son, ano1, ano2);
 				}
 			}
-			else if(ano2 < actual->year){
+			else if(ano2 <= actual->year){
 				if(actual->left_son != -1){
 					fseek(f,2*sizeof(int) + (actual->left_son)*sizeof(node),SEEK_SET);
 					fread(&son,sizeof(node),1,f);
@@ -643,7 +643,7 @@ void find_authors_years_in_range(FILE* f, node* actual, char name1[MAXNAMESIZE],
 
 				}
 			}
-			else if(strcmp(name2, (actual)->name) < 0){ 
+			else if(strcmp(name2, (actual)->name) <= 0){ 
 				if(actual->left_son != -1){
 					fseek(f,2*sizeof(int) + (actual->left_son)*sizeof(node),SEEK_SET);
 					fread(&son,sizeof(node),1,f);
@@ -671,7 +671,7 @@ void find_authors_years_in_range(FILE* f, node* actual, char name1[MAXNAMESIZE],
 					find_authors_years_in_range(f, &son, name1, name2, ano1, ano2);
 				}
 			}
-			else if(ano2 < actual->year){
+			else if(ano2 <= actual->year){
 				if(actual->left_son != -1){
 					fseek(f,2*sizeof(int) + (actual->left_son)*sizeof(node),SEEK_SET);
 					fread(&son,sizeof(node),1,f);
