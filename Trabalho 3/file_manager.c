@@ -410,8 +410,8 @@ void print_linked_pages(){
 	fclose(f);
 }
 
-//Find the page with the correspondent index
-void find_node_simple(FILE* f, node* actual, bool* found, char name[MAXNAMESIZE]){
+//Find the page of the author to print their record
+void find_author_simple(FILE* f, node* actual, bool* found, char name[MAXNAMESIZE]){
 	if(actual->is_page){
 		for(int i = 0; i<actual->p.qty;i++){
 			if(strcmp(name, actual->p.records[i].data.name) == 0){
@@ -430,14 +430,14 @@ void find_node_simple(FILE* f, node* actual, bool* found, char name[MAXNAMESIZE]
 			if(actual->left_son != -1){
 				fseek(f,2*sizeof(int) + (actual->left_son)*sizeof(node),SEEK_SET);
 				fread(&son,sizeof(node),1,f);
-				find_node_simple(f, &son, found, name);
+				find_author_simple(f, &son, found, name);
 			}
 		}
 		else if(strcmp(name, actual->name) > 0){
 			if(actual->right_son != -1){
 				fseek(f,2*sizeof(int) + (actual->right_son)*sizeof(node),SEEK_SET);
 				fread(&son,sizeof(node),1,f);
-				find_node_simple(f, &son, found,name);
+				find_author_simple(f, &son, found,name);
 			}
 		}
 	}
@@ -445,26 +445,99 @@ void find_node_simple(FILE* f, node* actual, bool* found, char name[MAXNAMESIZE]
 		if(actual->left_son != -1){
 			fseek(f,2*sizeof(int) + (actual->left_son)*sizeof(node),SEEK_SET);
 			fread(&son,sizeof(node),1,f);
-			find_node_simple(f, &son, found,name);
+			find_author_simple(f, &son, found,name);
 		}
 		if(actual->right_son != -1){
 			fseek(f,2*sizeof(int) + (actual->right_son)*sizeof(node),SEEK_SET);
 			fread(&son,sizeof(node),1,f);
-			find_node_simple(f, &son, found, name);
+			find_author_simple(f, &son, found, name);
 		}		
 	}
 }
 
+//Try to find all the records with the author's name
 void simple_search_name(char name[MAXNAMESIZE]){
-	bool found = false;
 	FILE *f;
 	if(!(f = fopen(MAIN_FILE,"rb+"))) exit(-1);
-	//Pega a raiz
+
 	fseek(f,2*sizeof(int) + 0*sizeof(node),SEEK_SET);
 	node root;
 	fread(&root,sizeof(node),1,f);
-	find_node_simple(f, &root, &found, name);
+
+	bool found = false;
+	find_author_simple(f, &root, &found, name);
 	if(!found)
 		printf("nao foi encontrado registro com nome: %s\n", name);
+	fclose(f);
+}
+
+//Find the pages in range of the authors' name and print the records
+void find_authors_in_range(FILE* f, node* actual, char name1[MAXNAMESIZE], char name2[MAXNAMESIZE]){
+	if(actual->is_page){
+		for(int i = 0; i<actual->p.qty;i++){
+			//imprime os records que se encontram no range
+			if(strcmp(name1, actual->p.records[i].data.name) <= 0 && strcmp(name2, actual->p.records[i].data.name) >= 0){
+				printf("nome: %s\n", actual->p.records[i].data.name);
+				printf("%s\n", actual->p.records[i].data.title);
+				printf("%u\n", actual->p.records[i].data.year);
+				printf("%s\n", actual->p.records[i].data.file);
+			}
+		}
+	}
+	
+	node son;
+	if(actual->level%2!=0){
+		if(strcmp(name1, (actual)->name) == 0 || (strcmp(name1, (actual)->name) < 0 && strcmp(name2, (actual)->name) > 0)) {
+			if(actual->left_son != -1){
+				fseek(f,2*sizeof(int) + (actual->left_son)*sizeof(node),SEEK_SET);
+				fread(&son,sizeof(node),1,f);
+				find_authors_in_range(f, &son, name1, name2);
+			}
+			if(actual->right_son != -1){
+				fseek(f,2*sizeof(int) + (actual->right_son)*sizeof(node),SEEK_SET);
+				fread(&son,sizeof(node),1,f);
+				find_authors_in_range(f, &son, name1, name2);
+			}
+		}
+		else if(strcmp(name2, (actual)->name) <= 0){ //caso esteja no range, vai pros dois l
+			if(actual->left_son != -1){
+				fseek(f,2*sizeof(int) + (actual->left_son)*sizeof(node),SEEK_SET);
+				fread(&son,sizeof(node),1,f);
+				find_authors_in_range(f, &son, name1, name2);
+			}
+		}
+		else if(strcmp(name1, (actual)->name) > 0){
+			if(actual->right_son != -1){
+			fseek(f,2*sizeof(int) + (actual->right_son)*sizeof(node),SEEK_SET);
+			fread(&son,sizeof(node),1,f);
+			find_authors_in_range(f, &son, name1, name2);
+			}	
+		}
+	}
+	else{
+		if(actual->left_son != -1){
+			fseek(f,2*sizeof(int) + (actual->left_son)*sizeof(node),SEEK_SET);
+			fread(&son,sizeof(node),1,f);
+			find_authors_in_range(f, &son, name1, name2);
+		}
+		if(actual->right_son != -1){
+			fseek(f,2*sizeof(int) + (actual->right_son)*sizeof(node),SEEK_SET);
+			fread(&son,sizeof(node),1,f);
+			find_authors_in_range(f, &son, name1, name2);
+		}		
+	}
+}
+
+//Find the pages in range of the authors' name and print the records
+void range_author_search(char name1[MAXNAMESIZE], char name2[MAXNAMESIZE]){
+	FILE *f;
+	if(!(f = fopen(MAIN_FILE,"rb+"))) exit(-1);
+
+	fseek(f,2*sizeof(int) + 0*sizeof(node),SEEK_SET);
+	node root;
+	fread(&root,sizeof(node),1,f);
+
+	find_authors_in_range(f, &root, name1, name2);
+
 	fclose(f);
 }

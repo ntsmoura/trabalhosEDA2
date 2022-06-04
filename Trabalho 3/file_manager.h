@@ -24,7 +24,8 @@ File: file_manager.h
     int find_page(int position, int* count, int page_index, node* indexes, int indexes_size, bool* found, int* page_position); //Find page node position
     void print_page(int page_node_index); //Print the specified page and all the linked ones
     void simple_search_name(char name[MAXNAMESIZE]);
-    void find_node_simple(FILE* f, node* actual, bool* found, char name[MAXNAMESIZE]);
+    void find_author_simple(FILE* f, node* actual, bool* found, char name[MAXNAMESIZE]);
+    void range_author_search(char name1[MAXNAMESIZE], char name2[MAXNAMESIZE]);
     
 
 #endif

@@ -87,6 +87,16 @@ int main(){
                     simple_search_name(name);
                 }
                 break;
+                case 'n':{
+                    char name1[MAXNAMESIZE];
+                    getchar();
+                    scanf("%20[^\n]", name1);
+                    char name2[MAXNAMESIZE];
+                    getchar();
+                    scanf("%20[^\n]", name2);
+                    range_author_search(name1, name2);
+                }
+                break;
                 case 'e':{
                 }
                 break;
