@@ -107,6 +107,22 @@ int main(){
                     range_year_search(ano1, ano2);
                 }
                 break;
+                case 'q':{
+                    char name1[MAXNAMESIZE];
+                    getchar();
+                    scanf("%20[^\n]", name1);
+                    char name2[MAXNAMESIZE];
+                    getchar();
+                    scanf("%20[^\n]", name2);
+                    unsigned int ano1;
+                    getchar();
+                    scanf("%u", &ano1);
+                    unsigned int ano2;
+                    getchar();
+                    scanf("%u", &ano2);
+                    range_author_year_search(name1, name2, ano1, ano2);
+                }
+                break;
                 case 'e':{
                 }
                 break;

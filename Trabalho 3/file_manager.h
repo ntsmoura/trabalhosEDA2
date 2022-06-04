@@ -23,11 +23,14 @@ File: file_manager.h
     node* load_indexes_vector(int* indexes_size); //load k-d tree indexes into a vector
     int find_page(int position, int* count, int page_index, node* indexes, int indexes_size, bool* found, int* page_position); //Find page node position
     void print_page(int page_node_index); //Print the specified page and all the linked ones
-    void simple_search_name(char name[MAXNAMESIZE]);
-    void find_author_simple(FILE* f, node* actual, bool* found, char name[MAXNAMESIZE]);
-    void range_author_search(char name1[MAXNAMESIZE], char name2[MAXNAMESIZE]);
-    void range_year_search(unsigned int ano1, unsigned int ano2);
-    void find_years_in_range(FILE* f, node* actual, unsigned int ano1, unsigned int ano2);
+    void simple_search_name(char name[MAXNAMESIZE]); //Try to find all the records with the author's name
+    void find_author_simple(FILE* f, node* actual, bool* found, char name[MAXNAMESIZE]); //Try to find all the records in the range of the authors' names
+    void range_author_search(char name1[MAXNAMESIZE], char name2[MAXNAMESIZE]); //Find the page of the author to print their record
+    void find_authors_in_range(FILE* f, node* actual, char name1[MAXNAMESIZE], char name2[MAXNAMESIZE]); //Find the pages in range of the authors' names and print the records
+    void range_year_search(unsigned int ano1, unsigned int ano2); //Try to find all the records in range of the years of release
+    void find_years_in_range(FILE* f, node* actual, unsigned int ano1, unsigned int ano2); //Find the pages in range of the years of release and print the records
+    void range_author_year_search(char name1[MAXNAMESIZE], char name2[MAXNAMESIZE], unsigned int ano1, unsigned int ano2); //Try to find all the records in range of the authors' names and the years of release
+    void find_authors_years_in_range(FILE* f, node* actual, char name1[MAXNAMESIZE], char name2[MAXNAMESIZE], unsigned int ano1, unsigned int ano2); //Find the pages in range of the authors' names and the years of release and print the records
     
 
 #endif
