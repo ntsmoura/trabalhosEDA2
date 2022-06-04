@@ -410,38 +410,60 @@ void print_linked_pages(){
 	fclose(f);
 }
 
-bool print_record_ss(page p, char name[MAXNAMESIZE]){
-	bool found = false;
-	for(int i = 0; i<p.qty;i++){
-		//printf("teste: %s --- %s\n", p.records[i].data.name, name);
-		if(strcmp(name, p.records[i].data.name) == 0){
-			printf("ENTROU\n");
-			printf("nome: %s\n", p.records[i].data.name);
-			printf("%s\n", p.records[i].data.title);
-			printf("%u\n", p.records[i].data.year);
-			printf("%s\n", p.records[i].data.file);
-			found = true;
+//Find the page with the correspondent index
+void find_node_simple(FILE* f, node* actual, bool* found, char name[MAXNAMESIZE]){
+	if(actual->is_page){
+		for(int i = 0; i<actual->p.qty;i++){
+			if(strcmp(name, actual->p.records[i].data.name) == 0){
+				printf("nome: %s\n", actual->p.records[i].data.name);
+				printf("%s\n", actual->p.records[i].data.title);
+				printf("%u\n", actual->p.records[i].data.year);
+				printf("%s\n", actual->p.records[i].data.file);
+				*found = true;
+			}
 		}
 	}
-	return found;
+	
+	node son;
+	if(actual->level%2!=0){
+		if(strcmp(name, (actual)->name) <= 0) {
+			if(actual->left_son != -1){
+				fseek(f,2*sizeof(int) + (actual->left_son)*sizeof(node),SEEK_SET);
+				fread(&son,sizeof(node),1,f);
+				find_node_simple(f, &son, found, name);
+			}
+		}
+		else if(strcmp(name, actual->name) > 0){
+			if(actual->right_son != -1){
+				fseek(f,2*sizeof(int) + (actual->right_son)*sizeof(node),SEEK_SET);
+				fread(&son,sizeof(node),1,f);
+				find_node_simple(f, &son, found,name);
+			}
+		}
+	}
+	else{
+		if(actual->left_son != -1){
+			fseek(f,2*sizeof(int) + (actual->left_son)*sizeof(node),SEEK_SET);
+			fread(&son,sizeof(node),1,f);
+			find_node_simple(f, &son, found,name);
+		}
+		if(actual->right_son != -1){
+			fseek(f,2*sizeof(int) + (actual->right_son)*sizeof(node),SEEK_SET);
+			fread(&son,sizeof(node),1,f);
+			find_node_simple(f, &son, found, name);
+		}		
+	}
 }
 
-void simple_search(char name[MAXNAMESIZE]){
-	int number;
-	FILE *f;
-	if(!(f = fopen(MAIN_FILE,"rb"))) exit(-1);
-	fseek(f,0,SEEK_SET);
-	fread(&number,sizeof(int),1,f);
-	fseek(f,2*sizeof(int),SEEK_SET);
+void simple_search_name(char name[MAXNAMESIZE]){
 	bool found = false;
-	for(int i = 0; i<number;i++){
-		node n;
-		fread(&n,sizeof(node),1,f);
-		if(n.is_page){
-			if(print_record_ss(n.p, name))
-				found = true;
-		}
-	}
+	FILE *f;
+	if(!(f = fopen(MAIN_FILE,"rb+"))) exit(-1);
+	//Pega a raiz
+	fseek(f,2*sizeof(int) + 0*sizeof(node),SEEK_SET);
+	node root;
+	fread(&root,sizeof(node),1,f);
+	find_node_simple(f, &root, &found, name);
 	if(!found)
 		printf("nao foi encontrado registro com nome: %s\n", name);
 	fclose(f);

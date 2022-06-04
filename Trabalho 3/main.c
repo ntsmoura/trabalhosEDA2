@@ -84,7 +84,7 @@ int main(){
                     char name[MAXNAMESIZE];
                     getchar();
                     scanf("%20[^\n]", name);
-                    simple_search(name);
+                    simple_search_name(name);
                 }
                 break;
                 case 'e':{
