@@ -413,14 +413,28 @@ void print_linked_pages(){
 //Find the page of the author to print their record
 void find_author_simple(FILE* f, node* actual, bool* found, char name[MAXNAMESIZE]){
 	if(actual->is_page){
-		for(int i = 0; i<actual->p.qty;i++){
-			if(strcmp(name, actual->p.records[i].data.name) == 0){
-				printf("nome: %s\n", actual->p.records[i].data.name);
-				printf("%s\n", actual->p.records[i].data.title);
-				printf("%u\n", actual->p.records[i].data.year);
-				printf("%s\n", actual->p.records[i].data.file);
-				*found = true;
+		int number;
+		fseek(f,0,SEEK_SET);
+		fread(&number,sizeof(int),1,f);
+
+		page p = actual->p;
+		bool stop_print = false;
+
+		while(!stop_print){
+			for(int i = 0; i<p.qty;i++){
+				if(strcmp(name, p.records[i].data.name) == 0){
+					printf("nome: %s\n", p.records[i].data.name);
+					printf("%s\n", p.records[i].data.title);
+					printf("%u\n", p.records[i].data.year);
+					printf("%s\n", p.records[i].data.file);
+					*found = true;
+				}
 			}
+			if(p.linked_page != -1){
+				fseek(f,2*sizeof(int)+number*sizeof(node)+(p.linked_page)*sizeof(page),SEEK_SET);
+				fread(&p,sizeof(page),1,f);
+			} 
+			else stop_print = true;
 		}
 	}
 	else{
@@ -437,7 +451,7 @@ void find_author_simple(FILE* f, node* actual, bool* found, char name[MAXNAMESIZ
 				if(actual->right_son != -1){
 					fseek(f,2*sizeof(int) + (actual->right_son)*sizeof(node),SEEK_SET);
 					fread(&son,sizeof(node),1,f);
-					find_author_simple(f, &son, found,name);
+					find_author_simple(f, &son, found, name);
 				}
 			}
 		}
@@ -445,7 +459,7 @@ void find_author_simple(FILE* f, node* actual, bool* found, char name[MAXNAMESIZ
 			if(actual->left_son != -1){
 				fseek(f,2*sizeof(int) + (actual->left_son)*sizeof(node),SEEK_SET);
 				fread(&son,sizeof(node),1,f);
-				find_author_simple(f, &son, found,name);
+				find_author_simple(f, &son, found, name);
 			}
 			if(actual->right_son != -1){
 				fseek(f,2*sizeof(int) + (actual->right_son)*sizeof(node),SEEK_SET);
@@ -475,13 +489,27 @@ void simple_search_name(char name[MAXNAMESIZE]){
 //Find the pages in range of the authors' names and print the records
 void find_authors_in_range(FILE* f, node* actual, char name1[MAXNAMESIZE], char name2[MAXNAMESIZE]){
 	if(actual->is_page){
-		for(int i = 0; i<actual->p.qty;i++){
-			if(strcmp(name1, actual->p.records[i].data.name) <= 0 && strcmp(name2, actual->p.records[i].data.name) >= 0){
-				printf("%s\n", actual->p.records[i].data.name);
-				printf("%s\n", actual->p.records[i].data.title);
-				printf("%u\n", actual->p.records[i].data.year);
-				printf("%s\n", actual->p.records[i].data.file);
+		int number;
+		fseek(f,0,SEEK_SET);
+		fread(&number,sizeof(int),1,f);
+
+		page p = actual->p;
+		bool stop_print = false;
+
+		while(!stop_print){
+			for(int i = 0; i<p.qty;i++){
+				if(strcmp(name1, p.records[i].data.name) <= 0 && strcmp(name2, p.records[i].data.name) >= 0){
+					printf("%s\n", p.records[i].data.name);
+					printf("%s\n", p.records[i].data.title);
+					printf("%u\n", p.records[i].data.year);
+					printf("%s\n", p.records[i].data.file);
+				}
 			}
+			if(p.linked_page != -1){
+				fseek(f,2*sizeof(int)+number*sizeof(node)+(p.linked_page)*sizeof(page),SEEK_SET);
+				fread(&p,sizeof(page),1,f);
+			} 
+			else stop_print = true;
 		}
 	}
 	else{
@@ -546,13 +574,27 @@ void range_author_search(char name1[MAXNAMESIZE], char name2[MAXNAMESIZE]){
 //Find the pages in range of the years of release and print the records
 void find_years_in_range(FILE* f, node* actual, unsigned int ano1, unsigned int ano2){
 	if(actual->is_page){
-		for(int i = 0; i<actual->p.qty;i++){
-			if(ano1 <= actual->p.records[i].data.year && ano2 >= actual->p.records[i].data.year){
-				printf("%s\n", actual->p.records[i].data.name);
-				printf("%s\n", actual->p.records[i].data.title);
-				printf("%u\n", actual->p.records[i].data.year);
-				printf("%s\n", actual->p.records[i].data.file);
+		int number;
+		fseek(f,0,SEEK_SET);
+		fread(&number,sizeof(int),1,f);
+
+		page p = actual->p;
+		bool stop_print = false;
+
+		while(!stop_print){
+			for(int i = 0; i<p.qty;i++){
+			if(ano1 <= p.records[i].data.year && ano2 >= p.records[i].data.year){
+					printf("%s\n", p.records[i].data.name);
+					printf("%s\n", p.records[i].data.title);
+					printf("%u\n", p.records[i].data.year);
+					printf("%s\n", p.records[i].data.file);
+				}
 			}
+			if(p.linked_page != -1){
+				fseek(f,2*sizeof(int)+number*sizeof(node)+(p.linked_page)*sizeof(page),SEEK_SET);
+				fread(&p,sizeof(page),1,f);
+			} 
+			else stop_print = true;
 		}
 	}
 	else{
@@ -617,14 +659,28 @@ void range_year_search(unsigned int ano1, unsigned int ano2){
 //Find the pages in range of the authors' names and the years of release and print the records
 void find_authors_years_in_range(FILE* f, node* actual, char name1[MAXNAMESIZE], char name2[MAXNAMESIZE], unsigned int ano1, unsigned int ano2){
 	if(actual->is_page){
-		for(int i = 0; i<actual->p.qty;i++){
-			if((strcmp(name1, actual->p.records[i].data.name) <= 0 && strcmp(name2, actual->p.records[i].data.name) >= 0)
-				&& (ano1 <= actual->p.records[i].data.year && ano2 >= actual->p.records[i].data.year)){
-				printf("%s\n", actual->p.records[i].data.name);
-				printf("%s\n", actual->p.records[i].data.title);
-				printf("%u\n", actual->p.records[i].data.year);
-				printf("%s\n", actual->p.records[i].data.file);
+		int number;
+		fseek(f,0,SEEK_SET);
+		fread(&number,sizeof(int),1,f);
+
+		page p = actual->p;
+		bool stop_print = false;
+
+		while(!stop_print){
+			for(int i = 0; i<p.qty;i++){
+			if((strcmp(name1, p.records[i].data.name) <= 0 && strcmp(name2, p.records[i].data.name) >= 0)
+				&& (ano1 <= p.records[i].data.year && ano2 >= p.records[i].data.year)){
+					printf("%s\n", p.records[i].data.name);
+					printf("%s\n", p.records[i].data.title);
+					printf("%u\n", p.records[i].data.year);
+					printf("%s\n", p.records[i].data.file);
+				}
 			}
+			if(p.linked_page != -1){
+				fseek(f,2*sizeof(int)+number*sizeof(node)+(p.linked_page)*sizeof(page),SEEK_SET);
+				fread(&p,sizeof(page),1,f);
+			} 
+			else stop_print = true;
 		}
 	}
 	else{
