@@ -32,6 +32,8 @@ File: file_manager.h
     void range_author_year_search(char name1[MAXNAMESIZE], char name2[MAXNAMESIZE], unsigned int ano1, unsigned int ano2); //Try to find all the records in range of the authors' names and the years of release
     void find_authors_years_in_range(FILE* f, node* actual, char name1[MAXNAMESIZE], char name2[MAXNAMESIZE], unsigned int ano1, unsigned int ano2); //Find the pages in range of the authors' names and the years of release and print the records
     int* create_pi_table(char word[MAXWORDSIZE]); //Create pi table
+    //void print_line_and_positions(char file_name[MAXNAMESIZE],char word[MAXWORDSIZE]); 
+    int find_word_inside_file(int flag, char file_name[MAXNAMESIZE],char word[MAXWORDSIZE]);//Find word inside a text file
     
 
 #endif

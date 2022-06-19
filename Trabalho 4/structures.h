@@ -38,8 +38,8 @@ typedef struct {
 typedef struct {
    int level;
    bool is_page;
-   int left_son;
-   int right_son;
+   int left_child;
+   int right_child;
    union{
       unsigned int year;
       char name[MAXNAMESIZE];

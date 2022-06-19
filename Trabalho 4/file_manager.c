@@ -10,6 +10,71 @@ File: file_manager.c
 #include "structures.h"
 #include <string.h>
 
+/*typedef struct node_q node_q;
+
+struct node_q {
+	int line, position;
+	node_q* next;
+
+};
+
+//Declaração do tipo queue
+typedef struct {
+    int size;
+    node_q* first;
+	node_q* last;
+} queue;
+
+//Função para inicializar queue
+queue * create_q(){
+	queue* f = (queue*) malloc(sizeof(queue));
+ 	if(f!=NULL){
+ 		f->first = NULL;
+		f->last = NULL;
+ 		f->size = 0;
+		return f;
+ 	}
+ 	else return NULL;
+}
+
+
+//Função para checar se a queue está vazia
+int isEmpty_q(queue *f){
+	if(f->size == 0) return 1;
+	else return 0;
+}
+
+//Função para enfileirar elemento
+void push_q(queue *f,node_q* x){
+	if(isEmpty_q(f)==1){
+		f->first = x;
+		f->last = x;
+	} else{
+		f->last->next = x;
+		f->last = x;
+	}
+	f->size = f->size + 1;
+}
+
+//Função para desenfileirar primeiro elemento da queue (NULL se vazia)
+node_q* pop_q(queue *f){
+ 	if(isEmpty_q(f)==1){
+    return NULL;
+  }
+ 	else{
+ 		node_q* first = f->first;
+		f->first = f->first->next;
+		f->size = f->size - 1;
+		return first;
+ 	}
+}
+
+
+//Retorna tamanho da queue
+ int size_q(queue* f){
+  return f->size;
+}*/
+
 //Create the main file if it doesn't exist
 void create_file(){
     FILE *f;
@@ -38,15 +103,15 @@ void create_root(record r){
 	node n;
 	n.level = 1;
 	n.is_page = false;
-	n.left_son = -1;
-	n.right_son = -1;
+	n.left_child = -1;
+	n.right_child = -1;
 	strcpy(n.name,r.data.name);
 	fwrite(&n,sizeof(node),1,f);
 	fclose(f);
 }
 
 //Search for the leaf node to insert node or record
-int search_node(record r, bool* is_left_son, int* level){
+int search_node(record r, bool* is_left_child, int* level){
 	FILE *f;
 	if(!(f = fopen(MAIN_FILE,"rb+"))) exit(-1);
 	fseek(f,2*sizeof(int),SEEK_SET);
@@ -59,44 +124,44 @@ int search_node(record r, bool* is_left_son, int* level){
 		if(actual.level%2!=0) {
 			int result = strcmp(r.data.name,actual.name);
 			if(result <= 0){
-				if(actual.left_son == -1){
+				if(actual.left_child == -1){
 					found = 1;
-					*is_left_son = true;
+					*is_left_child = true;
 				}
 				else {
-					actual_position = 2*sizeof(int)+actual.left_son*sizeof(node);
+					actual_position = 2*sizeof(int)+actual.left_child*sizeof(node);
 					fseek(f,actual_position,SEEK_SET);
 					fread(&actual,sizeof(node),1,f);
 				}
 			} 
 			else {
-				if(actual.right_son == -1){
+				if(actual.right_child == -1){
 					found = 1;
 				}
 				else {
-					actual_position = 2*sizeof(int)+actual.right_son*sizeof(node);
+					actual_position = 2*sizeof(int)+actual.right_child*sizeof(node);
 					fseek(f,actual_position,SEEK_SET);
 					fread(&actual,sizeof(node),1,f);
 				}
 			}
 		} else {
 			if(r.data.year <= actual.year){
-				if(actual.left_son == -1){
+				if(actual.left_child == -1){
 					found = 1;
-					*is_left_son = true;
+					*is_left_child = true;
 				}
 				else {
-					actual_position = 2*sizeof(int)+actual.left_son*sizeof(node);
+					actual_position = 2*sizeof(int)+actual.left_child*sizeof(node);
 					fseek(f,actual_position,SEEK_SET);
 					fread(&actual,sizeof(node),1,f);
 				}
 			} 
 			else {
-				if(actual.right_son == -1){
+				if(actual.right_child == -1){
 					found = 1;
 				}
 				else {
-					actual_position = 2*sizeof(int)+actual.right_son*sizeof(node);
+					actual_position = 2*sizeof(int)+actual.right_child*sizeof(node);
 					fseek(f,actual_position,SEEK_SET);
 					fread(&actual,sizeof(node),1,f);
 				}
@@ -110,11 +175,11 @@ int search_node(record r, bool* is_left_son, int* level){
 
 //Insert key nodes in k-d tree
 void insert_node(record r){
-	bool* is_left_son = malloc(sizeof(bool));
+	bool* is_left_child = malloc(sizeof(bool));
 	int* level = malloc(sizeof(int));
 	*level = 1;
-	*is_left_son = false;
-	int actual_position = search_node(r,is_left_son,level);
+	*is_left_child = false;
+	int actual_position = search_node(r,is_left_child,level);
 	int number;
 	node actual;
 	FILE *f;
@@ -123,15 +188,15 @@ void insert_node(record r){
 	fread(&number,sizeof(int),1,f);
 	fseek(f,actual_position,SEEK_SET);
 	fread(&actual,sizeof(node),1,f);
-	if(*is_left_son) actual.left_son = number;
-	else actual.right_son = number;
+	if(*is_left_child) actual.left_child = number;
+	else actual.right_child = number;
 	fseek(f,actual_position,SEEK_SET);
 	fwrite(&actual,sizeof(node),1,f);
 	fseek(f,0,SEEK_END);
 	node new_node;
 	new_node.is_page = false;
-	new_node.left_son = -1;
-	new_node.right_son = -1;
+	new_node.left_child = -1;
+	new_node.right_child = -1;
 	new_node.level = *level;
 	if(*level%2!=0) strcpy(new_node.name,r.data.name);
 	else new_node.year = r.data.year;
@@ -142,7 +207,7 @@ void insert_node(record r){
 	fwrite(&number,sizeof(int),1,f);
 
 	free(level);
-	free(is_left_son);
+	free(is_left_child);
 	fclose(f);
 
 }
@@ -157,8 +222,8 @@ void insert_empty_pages(){
 	node actual;
 	node empty_page;
 	empty_page.is_page = true;
-	empty_page.left_son = -1;
-	empty_page.right_son = -1;
+	empty_page.left_child = -1;
+	empty_page.right_child = -1;
 	page p;
 	p.qty = 0;
 	p.linked_page = -1;
@@ -169,14 +234,14 @@ void insert_empty_pages(){
 		int actual_position = 2*sizeof(int)+i*sizeof(node);
 		fseek(f,actual_position,SEEK_SET);
 		fread(&actual,sizeof(node),1,f);
-		if(actual.left_son==-1) {
-			actual.left_son = current_number;
+		if(actual.left_child==-1) {
+			actual.left_child = current_number;
 			current_number+=1;
 			fseek(f,0,SEEK_END);
 			fwrite(&empty_page,sizeof(node),1,f);
 		}
-		if(actual.right_son==-1) {
-			actual.right_son = current_number;
+		if(actual.right_child==-1) {
+			actual.right_child = current_number;
 			current_number+=1;
 			fseek(f,0,SEEK_END);
 			fwrite(&empty_page,sizeof(node),1,f);
@@ -267,11 +332,11 @@ void insert_into_page(record r, int page_node_position){
 
 //Insert record into page finding the correct page and using isert_into_page
 void insert_record(record r){
-	bool* is_left_son = malloc(sizeof(bool));
+	bool* is_left_child = malloc(sizeof(bool));
 	int* level = malloc(sizeof(int));
 	*level = 1;
-	*is_left_son = false;
-	int page_position = search_node(r,is_left_son,level);
+	*is_left_child = false;
+	int page_position = search_node(r,is_left_child,level);
 	insert_into_page(r, page_position);
 }
 
@@ -304,20 +369,20 @@ node* load_indexes_vector(int *indexes_size){
 //Print k-d tree indexes
 void print_indexes(int position, node* indexes, int indexes_size){
 	if(!(position>=indexes_size)){
-		print_indexes((indexes+position)->left_son,indexes,indexes_size);
+		print_indexes((indexes+position)->left_child,indexes,indexes_size);
 		if((indexes+position)->level%2==0) printf("ano:");
 		else printf("nome:");
 		print_index_value(*(indexes+position));
 		printf("fesq:");
-		int fesq = (indexes+position)->left_son;
+		int fesq = (indexes+position)->left_child;
 		if(fesq < indexes_size) print_index_value(*(indexes+fesq));
 		else printf(" pagina ");
 		printf("fdir:");
-		int fdir = (indexes+position)->right_son;
+		int fdir = (indexes+position)->right_child;
 		if(fdir < indexes_size) print_index_value(*(indexes+fdir));
 		else printf(" pagina ");
 		printf("\n");
-		print_indexes((indexes+position)->right_son,indexes,indexes_size);
+		print_indexes((indexes+position)->right_child,indexes,indexes_size);
 	}
 }
 
@@ -330,8 +395,8 @@ void find_page(int position, int* count, int page_index, node* indexes, int inde
 		}
 		*count += 1;
 	} else if(!(*found)){
-		find_page((indexes+position)->left_son,count, page_index, indexes, indexes_size, found, page_position);
-		find_page((indexes+position)->right_son,count, page_index, indexes, indexes_size, found, page_position);
+		find_page((indexes+position)->left_child,count, page_index, indexes, indexes_size, found, page_position);
+		find_page((indexes+position)->right_child,count, page_index, indexes, indexes_size, found, page_position);
 	}
 }
 
@@ -369,10 +434,10 @@ void print_page_debug(page p){
 //for debug purposes only
 void print_node(node n){
 	if(!n.is_page){
-		if(n.level%2!=0) printf("LEVEL: %d, IS PAGE?: %d, LEFT SON: %d, RIGHT SON: %d, VALUE: %s\n",n.level,n.is_page,n.left_son,n.right_son,n.name);
-		else printf("LEVEL: %d, IS PAGE?: %d, LEFT SON: %d, RIGHT SON: %d, VALUE: %d\n",n.level,n.is_page,n.left_son,n.right_son,n.year);
+		if(n.level%2!=0) printf("LEVEL: %d, IS PAGE?: %d, LEFT CHILD: %d, RIGHT CHILD: %d, VALUE: %s\n",n.level,n.is_page,n.left_child,n.right_child,n.name);
+		else printf("LEVEL: %d, IS PAGE?: %d, LEFT CHILD: %d, RIGHT CHILD: %d, VALUE: %d\n",n.level,n.is_page,n.left_child,n.right_child,n.year);
 	} else{
-		printf("LEVEL: %d, IS PAGE?: %d, LEFT SON: %d, RIGHT SON: %d PAGE: ",n.level,n.is_page,n.left_son,n.right_son);
+		printf("LEVEL: %d, IS PAGE?: %d, LEFT CHILD: %d, RIGHT CHILD: %d PAGE: ",n.level,n.is_page,n.left_child,n.right_child);
 		print_page_debug(n.p);
 	}
 }
@@ -438,33 +503,33 @@ void find_author_simple(FILE* f, node* actual, bool* found, char name[MAXNAMESIZ
 		}
 	}
 	else{
-		node son;
+		node child;
 		if(actual->level%2!=0){
 			if(strcmp(name, (actual)->name) <= 0) {
-				if(actual->left_son != -1){
-					fseek(f,2*sizeof(int) + (actual->left_son)*sizeof(node),SEEK_SET);
-					fread(&son,sizeof(node),1,f);
-					find_author_simple(f, &son, found, name);
+				if(actual->left_child != -1){
+					fseek(f,2*sizeof(int) + (actual->left_child)*sizeof(node),SEEK_SET);
+					fread(&child,sizeof(node),1,f);
+					find_author_simple(f, &child, found, name);
 				}
 			}
 			else if(strcmp(name, actual->name) > 0){
-				if(actual->right_son != -1){
-					fseek(f,2*sizeof(int) + (actual->right_son)*sizeof(node),SEEK_SET);
-					fread(&son,sizeof(node),1,f);
-					find_author_simple(f, &son, found, name);
+				if(actual->right_child != -1){
+					fseek(f,2*sizeof(int) + (actual->right_child)*sizeof(node),SEEK_SET);
+					fread(&child,sizeof(node),1,f);
+					find_author_simple(f, &child, found, name);
 				}
 			}
 		}
 		else{
-			if(actual->left_son != -1){
-				fseek(f,2*sizeof(int) + (actual->left_son)*sizeof(node),SEEK_SET);
-				fread(&son,sizeof(node),1,f);
-				find_author_simple(f, &son, found, name);
+			if(actual->left_child != -1){
+				fseek(f,2*sizeof(int) + (actual->left_child)*sizeof(node),SEEK_SET);
+				fread(&child,sizeof(node),1,f);
+				find_author_simple(f, &child, found, name);
 			}
-			if(actual->right_son != -1){
-				fseek(f,2*sizeof(int) + (actual->right_son)*sizeof(node),SEEK_SET);
-				fread(&son,sizeof(node),1,f);
-				find_author_simple(f, &son, found, name);
+			if(actual->right_child != -1){
+				fseek(f,2*sizeof(int) + (actual->right_child)*sizeof(node),SEEK_SET);
+				fread(&child,sizeof(node),1,f);
+				find_author_simple(f, &child, found, name);
 			}		
 		}
 	}
@@ -513,45 +578,45 @@ void find_authors_in_range(FILE* f, node* actual, char name1[MAXNAMESIZE], char 
 		}
 	}
 	else{
-		node son;
+		node child;
 		if(actual->level%2!=0){
 			if(strcmp(name1, (actual)->name) == 0 || (strcmp(name1, (actual)->name) < 0 && strcmp(name2, (actual)->name) > 0)) {
-				if(actual->left_son != -1){
-					fseek(f,2*sizeof(int) + (actual->left_son)*sizeof(node),SEEK_SET);
-					fread(&son,sizeof(node),1,f);
-					find_authors_in_range(f, &son, name1, name2);
+				if(actual->left_child != -1){
+					fseek(f,2*sizeof(int) + (actual->left_child)*sizeof(node),SEEK_SET);
+					fread(&child,sizeof(node),1,f);
+					find_authors_in_range(f, &child, name1, name2);
 				}
-				if(actual->right_son != -1){
-					fseek(f,2*sizeof(int) + (actual->right_son)*sizeof(node),SEEK_SET);
-					fread(&son,sizeof(node),1,f);
-					find_authors_in_range(f, &son, name1, name2);
+				if(actual->right_child != -1){
+					fseek(f,2*sizeof(int) + (actual->right_child)*sizeof(node),SEEK_SET);
+					fread(&child,sizeof(node),1,f);
+					find_authors_in_range(f, &child, name1, name2);
 				}
 			}
 			else if(strcmp(name2, (actual)->name) <= 0){
-				if(actual->left_son != -1){
-					fseek(f,2*sizeof(int) + (actual->left_son)*sizeof(node),SEEK_SET);
-					fread(&son,sizeof(node),1,f);
-					find_authors_in_range(f, &son, name1, name2);
+				if(actual->left_child != -1){
+					fseek(f,2*sizeof(int) + (actual->left_child)*sizeof(node),SEEK_SET);
+					fread(&child,sizeof(node),1,f);
+					find_authors_in_range(f, &child, name1, name2);
 				}
 			}
 			else if(strcmp(name1, (actual)->name) > 0){
-				if(actual->right_son != -1){
-				fseek(f,2*sizeof(int) + (actual->right_son)*sizeof(node),SEEK_SET);
-				fread(&son,sizeof(node),1,f);
-				find_authors_in_range(f, &son, name1, name2);
+				if(actual->right_child != -1){
+				fseek(f,2*sizeof(int) + (actual->right_child)*sizeof(node),SEEK_SET);
+				fread(&child,sizeof(node),1,f);
+				find_authors_in_range(f, &child, name1, name2);
 				}	
 			}
 		}
 		else{
-			if(actual->left_son != -1){
-				fseek(f,2*sizeof(int) + (actual->left_son)*sizeof(node),SEEK_SET);
-				fread(&son,sizeof(node),1,f);
-				find_authors_in_range(f, &son, name1, name2);
+			if(actual->left_child != -1){
+				fseek(f,2*sizeof(int) + (actual->left_child)*sizeof(node),SEEK_SET);
+				fread(&child,sizeof(node),1,f);
+				find_authors_in_range(f, &child, name1, name2);
 			}
-			if(actual->right_son != -1){
-				fseek(f,2*sizeof(int) + (actual->right_son)*sizeof(node),SEEK_SET);
-				fread(&son,sizeof(node),1,f);
-				find_authors_in_range(f, &son, name1, name2);
+			if(actual->right_child != -1){
+				fseek(f,2*sizeof(int) + (actual->right_child)*sizeof(node),SEEK_SET);
+				fread(&child,sizeof(node),1,f);
+				find_authors_in_range(f, &child, name1, name2);
 			}		
 		}
 	}
@@ -598,45 +663,45 @@ void find_years_in_range(FILE* f, node* actual, unsigned int ano1, unsigned int 
 		}
 	}
 	else{
-		node son;
+		node child;
 		if(actual->level%2==0){
 			if(ano1 == actual->year || (ano1 < actual->year && ano2 > actual->year)) {
-				if(actual->left_son != -1){
-					fseek(f,2*sizeof(int) + (actual->left_son)*sizeof(node),SEEK_SET);
-					fread(&son,sizeof(node),1,f);
-					find_years_in_range(f, &son, ano1, ano2);
+				if(actual->left_child != -1){
+					fseek(f,2*sizeof(int) + (actual->left_child)*sizeof(node),SEEK_SET);
+					fread(&child,sizeof(node),1,f);
+					find_years_in_range(f, &child, ano1, ano2);
 				}
-				if(actual->right_son != -1){
-					fseek(f,2*sizeof(int) + (actual->right_son)*sizeof(node),SEEK_SET);
-					fread(&son,sizeof(node),1,f);
-					find_years_in_range(f, &son, ano1, ano2);
+				if(actual->right_child != -1){
+					fseek(f,2*sizeof(int) + (actual->right_child)*sizeof(node),SEEK_SET);
+					fread(&child,sizeof(node),1,f);
+					find_years_in_range(f, &child, ano1, ano2);
 				}
 			}
 			else if(ano2 <= actual->year){
-				if(actual->left_son != -1){
-					fseek(f,2*sizeof(int) + (actual->left_son)*sizeof(node),SEEK_SET);
-					fread(&son,sizeof(node),1,f);
-					find_years_in_range(f, &son, ano1, ano2);
+				if(actual->left_child != -1){
+					fseek(f,2*sizeof(int) + (actual->left_child)*sizeof(node),SEEK_SET);
+					fread(&child,sizeof(node),1,f);
+					find_years_in_range(f, &child, ano1, ano2);
 				}
 			}
 			else if(ano1 > actual->year){
-				if(actual->right_son != -1){
-				fseek(f,2*sizeof(int) + (actual->right_son)*sizeof(node),SEEK_SET);
-				fread(&son,sizeof(node),1,f);
-				find_years_in_range(f, &son, ano1, ano2);
+				if(actual->right_child != -1){
+				fseek(f,2*sizeof(int) + (actual->right_child)*sizeof(node),SEEK_SET);
+				fread(&child,sizeof(node),1,f);
+				find_years_in_range(f, &child, ano1, ano2);
 				}	
 			}
 		}
 		else{
-			if(actual->left_son != -1){
-				fseek(f,2*sizeof(int) + (actual->left_son)*sizeof(node),SEEK_SET);
-				fread(&son,sizeof(node),1,f);
-				find_years_in_range(f, &son, ano1, ano2);
+			if(actual->left_child != -1){
+				fseek(f,2*sizeof(int) + (actual->left_child)*sizeof(node),SEEK_SET);
+				fread(&child,sizeof(node),1,f);
+				find_years_in_range(f, &child, ano1, ano2);
 			}
-			if(actual->right_son != -1){
-				fseek(f,2*sizeof(int) + (actual->right_son)*sizeof(node),SEEK_SET);
-				fread(&son,sizeof(node),1,f);
-				find_years_in_range(f, &son, ano1, ano2);
+			if(actual->right_child != -1){
+				fseek(f,2*sizeof(int) + (actual->right_child)*sizeof(node),SEEK_SET);
+				fread(&child,sizeof(node),1,f);
+				find_years_in_range(f, &child, ano1, ano2);
 			}		
 		}
 	}
@@ -684,61 +749,61 @@ void find_authors_years_in_range(FILE* f, node* actual, char name1[MAXNAMESIZE],
 		}
 	}
 	else{
-		node son;
+		node child;
 		if(actual->level%2!=0){
 			if(strcmp(name1, (actual)->name) == 0 || (strcmp(name1, (actual)->name) < 0 && strcmp(name2, (actual)->name) > 0)) {
-				if(actual->left_son != -1){
-					fseek(f,2*sizeof(int) + (actual->left_son)*sizeof(node),SEEK_SET);
-					fread(&son,sizeof(node),1,f);
-					find_authors_years_in_range(f, &son, name1, name2, ano1, ano2);
+				if(actual->left_child != -1){
+					fseek(f,2*sizeof(int) + (actual->left_child)*sizeof(node),SEEK_SET);
+					fread(&child,sizeof(node),1,f);
+					find_authors_years_in_range(f, &child, name1, name2, ano1, ano2);
 				}
-				if(actual->right_son != -1){
-					fseek(f,2*sizeof(int) + (actual->right_son)*sizeof(node),SEEK_SET);
-					fread(&son,sizeof(node),1,f);
-					find_authors_years_in_range(f, &son, name1, name2, ano1, ano2);
+				if(actual->right_child != -1){
+					fseek(f,2*sizeof(int) + (actual->right_child)*sizeof(node),SEEK_SET);
+					fread(&child,sizeof(node),1,f);
+					find_authors_years_in_range(f, &child, name1, name2, ano1, ano2);
 
 				}
 			}
 			else if(strcmp(name2, (actual)->name) <= 0){ 
-				if(actual->left_son != -1){
-					fseek(f,2*sizeof(int) + (actual->left_son)*sizeof(node),SEEK_SET);
-					fread(&son,sizeof(node),1,f);
-					find_authors_years_in_range(f, &son, name1, name2, ano1, ano2);
+				if(actual->left_child != -1){
+					fseek(f,2*sizeof(int) + (actual->left_child)*sizeof(node),SEEK_SET);
+					fread(&child,sizeof(node),1,f);
+					find_authors_years_in_range(f, &child, name1, name2, ano1, ano2);
 				}
 			}
 			else if(strcmp(name1, (actual)->name) > 0){
-				if(actual->right_son != -1){
-				fseek(f,2*sizeof(int) + (actual->right_son)*sizeof(node),SEEK_SET);
-				fread(&son,sizeof(node),1,f);
-				find_authors_years_in_range(f, &son, name1, name2, ano1, ano2);
+				if(actual->right_child != -1){
+				fseek(f,2*sizeof(int) + (actual->right_child)*sizeof(node),SEEK_SET);
+				fread(&child,sizeof(node),1,f);
+				find_authors_years_in_range(f, &child, name1, name2, ano1, ano2);
 				}	
 			}
 		}
 		else if(actual->level%2==0){
 			if(ano1 == actual->year || (ano1 < actual->year && ano2 > actual->year)) {
-				if(actual->left_son != -1){
-					fseek(f,2*sizeof(int) + (actual->left_son)*sizeof(node),SEEK_SET);
-					fread(&son,sizeof(node),1,f);
-					find_authors_years_in_range(f, &son, name1, name2, ano1, ano2);
+				if(actual->left_child != -1){
+					fseek(f,2*sizeof(int) + (actual->left_child)*sizeof(node),SEEK_SET);
+					fread(&child,sizeof(node),1,f);
+					find_authors_years_in_range(f, &child, name1, name2, ano1, ano2);
 				}
-				if(actual->right_son != -1){
-					fseek(f,2*sizeof(int) + (actual->right_son)*sizeof(node),SEEK_SET);
-					fread(&son,sizeof(node),1,f);
-					find_authors_years_in_range(f, &son, name1, name2, ano1, ano2);
+				if(actual->right_child != -1){
+					fseek(f,2*sizeof(int) + (actual->right_child)*sizeof(node),SEEK_SET);
+					fread(&child,sizeof(node),1,f);
+					find_authors_years_in_range(f, &child, name1, name2, ano1, ano2);
 				}
 			}
 			else if(ano2 <= actual->year){
-				if(actual->left_son != -1){
-					fseek(f,2*sizeof(int) + (actual->left_son)*sizeof(node),SEEK_SET);
-					fread(&son,sizeof(node),1,f);
-					find_authors_years_in_range(f, &son, name1, name2, ano1, ano2);
+				if(actual->left_child != -1){
+					fseek(f,2*sizeof(int) + (actual->left_child)*sizeof(node),SEEK_SET);
+					fread(&child,sizeof(node),1,f);
+					find_authors_years_in_range(f, &child, name1, name2, ano1, ano2);
 				}
 			}
 			else if(ano1 > actual->year){
-				if(actual->right_son != -1){
-				fseek(f,2*sizeof(int) + (actual->right_son)*sizeof(node),SEEK_SET);
-				fread(&son,sizeof(node),1,f);
-				find_authors_years_in_range(f, &son, name1, name2, ano1, ano2);
+				if(actual->right_child != -1){
+				fseek(f,2*sizeof(int) + (actual->right_child)*sizeof(node),SEEK_SET);
+				fread(&child,sizeof(node),1,f);
+				find_authors_years_in_range(f, &child, name1, name2, ano1, ano2);
 				}	
 			}
 		}
@@ -775,3 +840,63 @@ int* create_pi_table(char word[MAXWORDSIZE]){
 	}
 	return pi_table;
 }
+
+//find word inside a text file [flag: 0 - find first ocurrence (don't print), 1 - find all ocurrences (print)]
+int find_word_inside_file(int flag, char file_name[MAXNAMESIZE],char word[MAXWORDSIZE]){
+	//queue* list = create_q();
+	int* pi_table = create_pi_table(word);
+	char word_aux[MAXWORDSIZE+1];
+	int m = 0;
+	int i = 1;
+	int found = 0;
+	int stop_count = 0;
+	for(int i = 0;i<MAXWORDSIZE;i++) {
+		word_aux[i+1] = word[i];
+		if(word[i]!='\0' && stop_count!=1) m = m+1;
+		else if(word[i]=='\0') stop_count = 1;
+	}
+	FILE    *f;
+    char    c;
+	int line = 1;
+     
+    if(!(f = fopen(file_name,"r"))) exit(-1);
+    
+	int q = 0;
+	if(flag==1) printf("ocorrencia(s) da palavra: %s\n",word);
+    while((c = fgetc(f))!=EOF) {
+		if(c!='\n'){
+			while(q>0 && word_aux[q+1]!=c) q = pi_table[q];
+			if(word_aux[q+1]==c) q = q+1;
+			if(q==m){
+				found = 1;
+				if(flag == 0) break;	
+				else printf("linha: %d posicao: %d\n",line,i-m+1);
+				//node_q* x = malloc(sizeof(node_q));
+				//x->line = line;
+				//x->position = i-m+1;
+				//push_q(list,x);
+			}
+			i=i+1;
+		} else {
+			line = line+1;
+			q = 0;
+			i = 1;
+		}
+    }
+	//return list;
+	return found;
+     
+    fclose(f);
+}
+
+/*void print_line_and_positions(char file_name[MAXNAMESIZE],char word[MAXWORDSIZE]){
+	queue* q = find_word_inside_file(file_name,word);
+	int size = size_q(q);
+	printf("ocorrencia(s) da palavra: %s\n",word);
+	for(int i = 0; i<size;i++){
+		node_q* x = pop_q(q);
+		printf("linha: %d, posicao: %d\n",x->line,x->position);
+		free(x);
+	}
+	free(q);
+}*/

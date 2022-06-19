@@ -147,8 +147,13 @@ int main(){
                 break;
                 //for debug purposes only
                 case '*':{
-                    print_nodes();
-                    print_linked_pages();
+                    //print_nodes();
+                    //print_linked_pages();
+                    char word[MAXWORDSIZE];
+                    int found;
+                    scanf("%s",word);
+                    found = find_word_inside_file(1,"in.txt",word);
+                    printf("encontrada? %d\n",found);
                 }
                 break;
             }
