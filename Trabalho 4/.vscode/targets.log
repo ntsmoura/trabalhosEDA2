@@ -1,0 +1,346 @@
+make.exe all --print-data-base --no-builtin-variables --no-builtin-rules --question
+# GNU Make 3.81
+# Copyright (C) 2006  Free Software Foundation, Inc.
+# This is free software; see the source for copying conditions.
+# There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A
+# PARTICULAR PURPOSE.
+
+# This program built for i686-pc-msys
+ 
+
+# Make data base, printed on Mon Jun  6 18:14:34 2022
+
+# Variables
+
+# automatic
+<D = $(patsubst %/,%,$(dir $<))
+# automatic
+?F = $(notdir $?)
+# makefile
+MAKEFLAGS = Rrqp
+# environment
+VSCODE_LOG_NATIVE = false
+# automatic
+?D = $(patsubst %/,%,$(dir $?))
+# automatic
+ 
+@D = $(patsubst %/,%,$(dir $@))
+# environment
+HOMEDRIVE = C:
+# automatic
+@F = $(notdir $@)
+# automatic
+^D = $(patsubst %/,%,$(dir $^))
+# makefile
+CURDIR := /c/Users/MOURA-PC/Desktop/trabalhosEDA2/Trabalho 3
+# default
+SHELL := /bin/sh
+# environment
+WINDIR = C:\WINDOWS
+# environment
+VSCODE_NLS_CONFIG = {"locale":"pt-br","availableLanguages":{"*":"pt-br"},"_languagePackId":"74ce6549a467d1dfaba55fb5394742c9.pt-br","_translationsConfigFile":"C:\\Users\\MOURA-PC\\AppData\\Roaming\\Code\\clp\\74ce6549a467d1dfaba55fb5394742c9.pt-br\\tcf.json","_cacheRoot":"C:\\Users\\MOURA-PC\\AppData\\Roaming\\Code\\clp\\74ce6549a467d1dfaba55fb5394742c9.pt-br","_resolvedLanguagePackCoreLocation":"C:\\Users\\MOURA-PC\\AppData\\Roaming\\Code\\clp\\74ce6549a467d1dfaba55fb5394742c9.pt-br\\c3511e6c69bb39013c4a4b7b9566ec1ca73fc4d5","_corruptedFile":"C:\\Users\\MOURA-PC\\AppData\\Roaming\\Code\\clp\\74ce6549a467d1dfaba55fb5394742c9.pt-br\\corrupted.info","_languagePackSupport":true}
+# environment
+ONEDRIVE = C:\Users\MOURA-PC\OneDrive
+# environment
+PATHEXT = .COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC
+# makefile (from `makefile', line 1)
+MAKEFILE_LIST :=  makefile
+# environment
+FPS_BROWSER_USER_PROFILE_STRING = Default
+# environment
+TMP = /tmp
+# environment
+VSCODE_VERBOSE_LOGGING = true
+# environment
+PROGRAMW6432 = C:\Program Files
+# environment
+PROGRAMDATA = C:\ProgramData
+# environment
+VSCODE_IPC_HOOK_EXTHOST = \\.\pipe\vscode-ipc-5c492626-fab2-4a4a-91c0-002c30da5dee-sock
+# environment
+VSCODE_CWD = C:\Users\MOURA-PC\AppData\Local\Programs\Microsoft VS Code
+# environment
+PATH = /c/WINDOWS/system32:/c/WINDOWS:/c/WINDOWS/System32/Wbem:/c/WINDOWS/System32/WindowsPowerShell/v1.0/:/c/WINDOWS/System32/OpenSSH/:/c/Program Files/dotnet/:/c/Program Files/Git/cmd:/c/wamp64/bin/php/php7.2.4:/c/ProgramData/ComposerSetup/bin:/c/Program Files (x86)/Windows Live/Shared:/e:/c/Program Files/swipl/bin:/c/Program Files (x86)/nodejs/:/c/Users/MOURA-PC/AppData/Local/Microsoft/WindowsApps:/c/Users/MOURA-PC/AppData/Local/Programs/Microsoft VS Code/bin:/mingw/bin:/usr/bin:/c/Users/MOURA-PC/AppData/Roaming/Composer/vendor/bin:/c/Users/MOURA-PC/AppData/Local/Microsoft/WindowsApps:/c/Users/MOURA-PC/AppData/Local/Programs/MiKTeX 2.9/miktex/bin/x64/:/c/Program Files/Java/jdk1.8.0_171/bin:/c/Users/MOURA-PC/AppData/Roaming/npm:/c/Program Files/heroku/bin:/d/ghcup/bin
+# environment
+COMMONPROGRAMW6432 = C:\Program Files\Common Files
+# environment
+GHCUP_INSTALL_BASE_PREFIX = D:\
+# environment
+PROCESSOR_ARCHITECTURE = x86
+# environment
+USERPROFILE = C:\Users\MOURA-PC
+# environment
+!C: = c:\Users\MOURA-PC\Desktop\trabalhosEDA2\Trabalho 3
+# environment
+ALLUSERSPROFILE = C:\ProgramData
+# environment
+VSCODE_LOG_STACK = false
+# environment
+NUMBER_OF_PROCESSORS = 12
+# environment
+ELECTRON_RUN_AS_NODE = 1
+# default
+.FEATURES := target-specific order-only second-expansion else-if archives jobserver check-symlink
+# environment
+CABAL_DIR = D:\cabal
+# automatic
+%F = $(notdir $%)
+# environment
+CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_7128_TMVCGOMFGTAEPRPM
+# environment
+VSCODE_PIPE_LOGGING = true
+# environment
+COMPUTERNAME = NATAN-PC
+# environment
+PROGRAMFILES = C:\Program Files (x86)
+# environment
+DRIVERDATA = C:\Windows\System32\Drivers\DriverData
+# environment
+ORIGINAL_XDG_CURRENT_DESKTOP = undefined
+# environment
+USERNAME = MOURA-PC
+# environment
+PUBLIC = C:\Users\Public
+# environment
+VSCODE_AMD_ENTRYPOINT = vs/workbench/api/node/extensionHostProcess
+# environment
+VSCODE_CODE_CACHE_PATH = C:\Users\MOURA-PC\AppData\Roaming\Code\CachedData\c3511e6c69bb39013c4a4b7b9566ec1ca73fc4d5
+# environment
+APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = 1
+# environment
+COMMONPROGRAMFILES = C:\Program Files (x86)\Common Files
+# environment
+LOGONSERVER = \\NATAN-PC
+# environment
+ONEDRIVECONSUMER = C:\Users\MOURA-PC\OneDrive
+# environment
+VSCODE_HANDLES_UNCAUGHT_ERRORS = true
+# environment
+USERDOMAIN = NATAN-PC
+# default
+MAKE = $(MAKE_COMMAND)
+# default
+MAKECMDGOALS := all
+# default
+MAKE_VERSION := 3.81
+# makefile
+.DEFAULT_GOAL := all
+# environment
+PROGRAMFILES(X86) = C:\Program Files (x86)
+# automatic
+%D = $(patsubst %/,%,$(dir $%))
+# environment
+LOCALAPPDATA = C:\Users\MOURA-PC\AppData\Local
+# environment
+PSMODULEPATH = C:\Program Files\WindowsPowerShell\Modules;C:\WINDOWS\system32\WindowsPowerShell\v1.0\Modules
+# default
+MAKE_COMMAND := make.exe
+# environment
+PROCESSOR_ARCHITEW6432 = AMD64
+# default
+.VARIABLES := 
+# automatic
+*F = $(notdir $*)
+# environment
+PROCESSOR_IDENTIFIER = AMD64 Family 23 Model 1 Stepping 1, AuthenticAMD
+# environment
+OS = Windows_NT
+# environment
+VSCODE_IPC_HOOK = \\.\pipe\714034fc6d6927ae66d8b2789cf82ab9-1.67.2-main-sock
+# environment
+HOMEPATH = \
+# environment
+COMMONPROGRAMFILES(X86) = C:\Program Files (x86)\Common Files
+# environment
+PROMPT = $P$G
+# environment
+MFLAGS = -Rrqp
+# automatic
+*D = $(patsubst %/,%,$(dir $*))
+# environment
+SYSTEMROOT = C:\WINDOWS
+# automatic
++D = $(patsubst %/,%,$(dir $+))
+# automatic
++F = $(notdir $+)
+# environment
+APPDATA = C:\Users\MOURA-PC\AppData\Roaming
+# environment
+TEMP = /tmp
+# environment
+COMSPEC = C:\WINDOWS\system32\cmd.exe
+# default
+MAKEFILES := 
+# automatic
+<F = $(notdir $<)
+# environment
+LC_ALL = C
+# automatic
+^F = $(notdir $^)
+# default
+SUFFIXES := 
+# environment
+SYSTEMDRIVE = C:
+# environment
+SESSIONNAME = Console
+# environment
+PROCESSOR_REVISION = 0101
+# default
+.INCLUDE_DIRS = /usr/include /usr/include
+# environment
+VBOX_HWVIRTEX_IGNORE_SVM_IN_USE = 1
+# environment
+MAKELEVEL := 0
+# environment
+LANG = C
+# environment
+PROCESSOR_LEVEL = 23
+# environment
+TERM = cygwin
+# environment
+FPS_BROWSER_APP_PROFILE_STRING = Internet Explorer
+# environment
+VSCODE_PID = 7128
+# environment
+USERDOMAIN_ROAMINGPROFILE = NATAN-PC
+# variable set hash-table stats:
+# Load=95/1024=9%, Rehash=0, Collisions=9/120=7%
+
+# Pattern-specific Variable Values
+
+# No pattern-specific variable values.
+
+# Directories
+
+# . (device -27159, inode 3132956): 15 files, no impossibilities.
+
+# 15 files, no impossibilities in 1 directories.
+
+# Implicit Rules
+
+# No implicit rules.
+
+# Files
+
+mrproper: clean
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+all: file_manager
+#  Command-line target.
+#  Implicit rule search has been done.
+#  File does not exist.
+#  File has been updated.
+#  Successfully updated.
+# variable set hash-table stats:
+# Load=0/32=0%, Rehash=0, Collisions=0/0=0%
+
+# Not a target:
+file_manager.h:
+#  Implicit rule search has been done.
+ 
+#  Last modified 2022-06-04 14:01:18
+#  File has been updated.
+#  Successfully updated.
+# variable set hash-table stats:
+# Load=0/32=0%, Rehash=0, Collisions=0/0=0%
+
+# Not a target:
+main.c:
+#  Implicit rule search has been done.
+ 
+#  Last modified 2022-06-04 12:58:16
+#  File has been updated.
+#  Successfully updated.
+# variable set hash-table stats:
+# Load=0/32=0%, Rehash=0, Collisions=0/0=0%
+
+# Not a target:
+.SUFFIXES:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+makefile:
+#  Implicit rule search has been done.
+#  Last modified 2022-05-20 15:19:06
+#  File has been updated.
+#  Successfully updated.
+# variable set hash-table stats:
+# Load=0/32=0%, Rehash=0, Collisions=0/0=0%
+
+# Not a target:
+.DEFAULT:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+file_manager.o: file_manager.c
+#  Implicit rule search has not been done.
+#  Last modified 2022-06-05 19:24:11
+#  File has been updated.
+#  Successfully updated.
+# variable set hash-table stats:
+# Load=0/32=0%, Rehash=0, Collisions=0/0=0%
+#  commands to execute (from `makefile', line 6):
+	gcc -o file_manager.o -c file_manager.c -Wall -Wextra  -Wpedantic
+	
+
+file_manager: file_manager.o main.o
+#  Implicit rule search has not been done.
+#  Last modified 2022-06-05 19:24:12
+#  File has been updated.
+#  Successfully updated.
+# variable set hash-table stats:
+# Load=0/32=0%, Rehash=0, Collisions=0/0=0%
+#  commands to execute (from `makefile', line 4):
+	gcc -o file_manager file_manager.o main.o
+	
+
+clean:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `makefile', line 10):
+	rm -rf *.o
+	rm -rf *.dat
+	
+
+main.o: main.c file_manager.h
+#  Implicit rule search has not been done.
+#  Last modified 2022-06-05 19:24:11
+#  File has been updated.
+#  Successfully updated.
+# variable set hash-table stats:
+# Load=0/32=0%, Rehash=0, Collisions=0/0=0%
+#  commands to execute (from `makefile', line 8):
+	gcc -o main.o -c main.c -Wall -Wextra -Werror -Wpedantic
+	
+
+# Not a target:
+file_manager.c:
+#  Implicit rule search has been done.
+#  Last modified 2022-06-04 14:01:18
+#  File has been updated.
+#  Successfully updated.
+# variable set hash-table stats:
+# Load=0/32=0%, Rehash=0, Collisions=0/0=0%
+
+# files hash-table stats:
+# Load=12/1024=1%, Rehash=0, Collisions=0/31=0%
+# VPATH Search Paths
+
+# No `vpath' search paths.
+
+# No general (`VPATH' variable) search path.
+
+# # of strings in strcache: 1
+# # of strcache buffers: 1
+# strcache size: total = 4096 / max = 4096 / min = 4096 / avg = 4096
+# strcache free: total = 4087 / max = 4087 / min = 4087 / avg = 4087
+
+# Finished Make data base on Mon Jun  6 18:14:34 2022
+
+ 

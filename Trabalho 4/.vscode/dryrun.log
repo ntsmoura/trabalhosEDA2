@@ -1,0 +1,9 @@
+make.exe --dry-run --always-make --keep-going --print-directory
+make.exe: Entering directory `/c/Users/MOURA-PC/Desktop/trabalhosEDA2/Trabalho 3'
+gcc -o file_manager.o -c file_manager.c -Wall -Wextra  -Wpedantic
+ 
+gcc -o main.o -c main.c -Wall -Wextra -Werror -Wpedantic
+gcc -o file_manager file_manager.o main.o
+ 
+make.exe: Leaving directory `/c/Users/MOURA-PC/Desktop/trabalhosEDA2/Trabalho 3'
+ 
