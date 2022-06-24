@@ -35,5 +35,6 @@ File: file_manager.h
     //void print_line_and_positions(char file_name[MAXNAMESIZE],char word[MAXWORDSIZE]); 
     int find_word_inside_file(int flag, char file_name[MAXNAMESIZE],char word[MAXWORDSIZE]);//Find word inside a text file
     void search_in_files(char word[MAXWORDSIZE]);
+    void word_search(char word[MAXWORDSIZE], char author_name[MAXNAMESIZE], char title[MAXNAMESIZE]);
 
 #endif

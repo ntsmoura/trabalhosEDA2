@@ -862,7 +862,7 @@ int find_word_inside_file(int flag, char file_name[MAXNAMESIZE],char word[MAXWOR
     if(!(f = fopen(file_name,"r"))) exit(-1);
     
 	int q = 0;
-	if(flag==1) printf("ocorrencia(s) da palavra: %s\n",word);
+	if(flag==1) printf("ocorrencia(s) da palavra: %s:\n",word);
     while((c = fgetc(f))!=EOF) {
 		if(c!='\n'){
 			while(q>0 && word_aux[q+1]!=c) q = pi_table[q];
@@ -959,5 +959,77 @@ void search_in_files(char word[MAXWORDSIZE]) {
 
 	if(!found)
 		printf("nao ha ocorrencia da palavra: %s\n", word);
+	fclose(f);
+}
+
+void find_author_title(FILE* f, node* actual, bool* found, char name[MAXNAMESIZE], char title[MAXNAMESIZE], char word[MAXWORDSIZE]){
+	if(actual->is_page){
+		int number;
+		fseek(f,0,SEEK_SET);
+		fread(&number,sizeof(int),1,f);
+
+		page p = actual->p;
+		bool stop_print = false;
+
+		while(!stop_print){
+			for(int i = 0; i<p.qty;i++){
+				if(strcmp(name, p.records[i].data.name) == 0 && strcmp(title, p.records[i].data.title) == 0){
+					find_word_inside_file(1, p.records[i].data.file, word);
+					*found = true;
+				}
+			}
+			if(p.linked_page != -1){
+				fseek(f,2*sizeof(int)+number*sizeof(node)+(p.linked_page)*sizeof(page),SEEK_SET);
+				fread(&p,sizeof(page),1,f);
+			} 
+			else stop_print = true;
+		}
+	}
+	else{
+		node child;
+		if(actual->level%2!=0){
+			if(strcmp(name, (actual)->name) <= 0) {
+				if(actual->left_child != -1){
+					fseek(f,2*sizeof(int) + (actual->left_child)*sizeof(node),SEEK_SET);
+					fread(&child,sizeof(node),1,f);
+					find_author_title(f, &child, found, name, title, word);
+				}
+			}
+			else if(strcmp(name, actual->name) > 0){
+				if(actual->right_child != -1){
+					fseek(f,2*sizeof(int) + (actual->right_child)*sizeof(node),SEEK_SET);
+					fread(&child,sizeof(node),1,f);
+					find_author_title(f, &child, found, name, title, word);
+				}
+			}
+		}
+		else{
+			if(actual->left_child != -1){
+				fseek(f,2*sizeof(int) + (actual->left_child)*sizeof(node),SEEK_SET);
+				fread(&child,sizeof(node),1,f);
+					find_author_title(f, &child, found, name, title, word);
+			}
+			if(actual->right_child != -1){
+				fseek(f,2*sizeof(int) + (actual->right_child)*sizeof(node),SEEK_SET);
+				fread(&child,sizeof(node),1,f);
+					find_author_title(f, &child, found, name, title, word);
+			}		
+		}
+	}
+}
+
+void word_search(char word[MAXWORDSIZE], char author_name[MAXNAMESIZE], char title[MAXNAMESIZE]) {
+	FILE *f;
+	if(!(f = fopen(MAIN_FILE,"rb+"))) exit(-1);
+
+	fseek(f,2*sizeof(int) + 0*sizeof(node),SEEK_SET);
+	node root;
+	fread(&root,sizeof(node),1,f);
+
+	bool found = false;
+	find_author_title(f, &root, &found, author_name, title, word);
+
+	if(!found)
+		printf("obra inexistente: titulo: %s - autor: %s \n", title, author_name);
 	fclose(f);
 }

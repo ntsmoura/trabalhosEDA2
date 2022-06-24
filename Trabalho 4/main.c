@@ -139,6 +139,19 @@ int main(){
                     search_in_files(word);
                 }
                 break;
+                case 'w':{
+                    char word[MAXNAMESIZE];
+                    scanf("%s",word);
+                    char author_name[MAXNAMESIZE];
+                    getchar();
+                    scanf("%20[^\n]", author_name);
+                    char title[MAXNAMESIZE];
+                    getchar();
+                    scanf("%20[^\n]", title);
+                    word_search(word, author_name, title);
+
+                }
+                break;
                  case 'm':{
                     char word[MAXWORDSIZE];
                     scanf("%s",word);
