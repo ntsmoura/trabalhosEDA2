@@ -900,3 +900,64 @@ int find_word_inside_file(int flag, char file_name[MAXNAMESIZE],char word[MAXWOR
 	}
 	free(q);
 }*/
+
+//Find the page of the file to print their record
+void find_file_by_name(FILE* f, node* actual, bool* found, char word[MAXNAMESIZE]){
+	if(actual->is_page){
+		int number;
+		fseek(f,0,SEEK_SET);
+		fread(&number,sizeof(int),1,f);
+
+		page p = actual->p;
+		bool stop_print = false;
+
+		while(!stop_print){
+			for(int i = 0; i<p.qty;i++){
+				if (find_word_inside_file(0, p.records[i].data.file, word) == 1){
+					printf("palavra: %s\n", word);
+					printf("titulo: %s\n", p.records[i].data.title);
+					printf("autor: %s\n", p.records[i].data.name);
+					printf("ano: %u\n", p.records[i].data.year);
+					*found = true;
+				}
+			}
+			
+			if(p.linked_page != -1){
+				fseek(f,2*sizeof(int)+number*sizeof(node)+(p.linked_page)*sizeof(page),SEEK_SET);
+				fread(&p,sizeof(page),1,f);
+			} 
+			else stop_print = true;
+		}
+	}
+	else{
+		node child;
+		
+		if(actual->left_child != -1){
+			fseek(f,2*sizeof(int) + (actual->left_child)*sizeof(node),SEEK_SET);
+			fread(&child,sizeof(node),1,f);
+			find_file_by_name(f, &child, found, word);
+		}
+
+		if(actual->right_child != -1){
+			fseek(f,2*sizeof(int) + (actual->right_child)*sizeof(node),SEEK_SET);
+			fread(&child,sizeof(node),1,f);
+			find_file_by_name(f, &child, found, word);
+		}
+	}
+}
+
+void search_in_files(char word[MAXWORDSIZE]) {
+	FILE *f;
+	if(!(f = fopen(MAIN_FILE,"rb+"))) exit(-1);
+
+	fseek(f,2*sizeof(int) + 0*sizeof(node),SEEK_SET);
+	node root;
+	fread(&root,sizeof(node),1,f);
+
+	bool found = false;
+	find_file_by_name(f, &root, &found, word);
+
+	if(!found)
+		printf("nao ha ocorrencia da palavra: %s\n", word);
+	fclose(f);
+}

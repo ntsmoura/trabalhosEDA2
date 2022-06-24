@@ -34,6 +34,6 @@ File: file_manager.h
     int* create_pi_table(char word[MAXWORDSIZE]); //Create pi table
     //void print_line_and_positions(char file_name[MAXNAMESIZE],char word[MAXWORDSIZE]); 
     int find_word_inside_file(int flag, char file_name[MAXNAMESIZE],char word[MAXWORDSIZE]);//Find word inside a text file
-    
+    void search_in_files(char word[MAXWORDSIZE]);
 
 #endif
