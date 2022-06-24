@@ -10,70 +10,6 @@ File: file_manager.c
 #include "structures.h"
 #include <string.h>
 
-/*typedef struct node_q node_q;
-
-struct node_q {
-	int line, position;
-	node_q* next;
-
-};
-
-//Declaração do tipo queue
-typedef struct {
-    int size;
-    node_q* first;
-	node_q* last;
-} queue;
-
-//Função para inicializar queue
-queue * create_q(){
-	queue* f = (queue*) malloc(sizeof(queue));
- 	if(f!=NULL){
- 		f->first = NULL;
-		f->last = NULL;
- 		f->size = 0;
-		return f;
- 	}
- 	else return NULL;
-}
-
-
-//Função para checar se a queue está vazia
-int isEmpty_q(queue *f){
-	if(f->size == 0) return 1;
-	else return 0;
-}
-
-//Função para enfileirar elemento
-void push_q(queue *f,node_q* x){
-	if(isEmpty_q(f)==1){
-		f->first = x;
-		f->last = x;
-	} else{
-		f->last->next = x;
-		f->last = x;
-	}
-	f->size = f->size + 1;
-}
-
-//Função para desenfileirar primeiro elemento da queue (NULL se vazia)
-node_q* pop_q(queue *f){
- 	if(isEmpty_q(f)==1){
-    return NULL;
-  }
- 	else{
- 		node_q* first = f->first;
-		f->first = f->first->next;
-		f->size = f->size - 1;
-		return first;
- 	}
-}
-
-
-//Retorna tamanho da queue
- int size_q(queue* f){
-  return f->size;
-}*/
 
 //Create the main file if it doesn't exist
 void create_file(){
@@ -843,11 +779,10 @@ int* create_pi_table(char word[MAXWORDSIZE]){
 
 //find word inside a text file [flag: 0 - find first ocurrence (don't print), 1 - find all ocurrences (print)]
 int find_word_inside_file(int flag, char file_name[MAXNAMESIZE],char word[MAXWORDSIZE]){
-	//queue* list = create_q();
 	int* pi_table = create_pi_table(word);
 	char word_aux[MAXWORDSIZE+1];
 	int m = 0;
-	int i = 1;
+	int j = 1;
 	int found = 0;
 	int stop_count = 0;
 	for(int i = 0;i<MAXWORDSIZE;i++) {
@@ -870,36 +805,21 @@ int find_word_inside_file(int flag, char file_name[MAXNAMESIZE],char word[MAXWOR
 			if(q==m){
 				found = 1;
 				if(flag == 0) break;	
-				else printf("linha: %d posicao: %d\n",line,i-m+1);
-				//node_q* x = malloc(sizeof(node_q));
-				//x->line = line;
-				//x->position = i-m+1;
-				//push_q(list,x);
+				else printf("linha: %d posicao: %d\n",line,j-m+1);
 			}
-			i=i+1;
+			j=j+1;
 		} else {
 			line = line+1;
 			q = 0;
-			i = 1;
+			j = 1;
 		}
     }
-	//return list;
+
 	return found;
      
     fclose(f);
 }
 
-/*void print_line_and_positions(char file_name[MAXNAMESIZE],char word[MAXWORDSIZE]){
-	queue* q = find_word_inside_file(file_name,word);
-	int size = size_q(q);
-	printf("ocorrencia(s) da palavra: %s\n",word);
-	for(int i = 0; i<size;i++){
-		node_q* x = pop_q(q);
-		printf("linha: %d, posicao: %d\n",x->line,x->position);
-		free(x);
-	}
-	free(q);
-}*/
 
 //Find the page of the file to print their record
 void find_file_by_name(FILE* f, node* actual, bool* found, char word[MAXNAMESIZE]){
