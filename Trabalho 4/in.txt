@@ -1,0 +1,33 @@
+8
+artur
+livro 1
+2020
+livro1.txt
+caio
+livro 2
+2030
+livro2.txt
+mateus
+livro 3
+2040
+livro3.txt
+dora
+livro 4
+2015
+livro4.txt
+ana
+livro 5
+2032
+livro5.txt
+abel
+livro 6
+2015
+livro6.txt
+amos
+livro 7
+2045
+livro7.txt
+natan
+livro 8
+2023
+livro8.txt
