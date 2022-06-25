@@ -34,7 +34,9 @@ File: file_manager.h
     int* create_pi_table(char word[MAXWORDSIZE]); //Create pi table
     //void print_line_and_positions(char file_name[MAXNAMESIZE],char word[MAXWORDSIZE]); 
     int find_word_inside_file(int flag, char file_name[MAXNAMESIZE],char word[MAXWORDSIZE]);//Find word inside a text file
-    void search_in_files(char word[MAXWORDSIZE]);
-    void word_search(char word[MAXWORDSIZE], char author_name[MAXNAMESIZE], char title[MAXNAMESIZE]);
+    void find_file_by_name(FILE* f, node* actual, bool* found, char word[MAXNAMESIZE]);//Finds the page of the file and tests if there are an occurrence
+    void search_in_files(char word[MAXWORDSIZE]);//Searches in all files of the word exists
+    void find_author_title(FILE* f, node* actual, bool* found, char name[MAXNAMESIZE], char title[MAXNAMESIZE], char word[MAXWORDSIZE]);//Finds the page with the author's name and title to print all occurrences 
+    void word_search(char word[MAXWORDSIZE], char author_name[MAXNAMESIZE], char title[MAXNAMESIZE]);//Makes a search by authors name, title and the word
 
 #endif
