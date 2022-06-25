@@ -777,7 +777,7 @@ int* create_pi_table(char word[MAXWORDSIZE]){
 	return pi_table;
 }
 
-//find word inside a text file [flag: 0 - find first ocurrence (don't print), 1 - find all ocurrences (print)]
+//find word inside a text file [flag: 0 - find first occurrence (don't print), 1 - find all occurrences (print)]
 int find_word_inside_file(int flag, char file_name[MAXNAMESIZE],char word[MAXWORDSIZE]){
 	int* pi_table = create_pi_table(word);
 	char word_aux[MAXWORDSIZE+1];
@@ -821,7 +821,7 @@ int find_word_inside_file(int flag, char file_name[MAXNAMESIZE],char word[MAXWOR
 }
 
 
-//Find the page of the file to print their record
+//Finds the page of the file and tests if there are an occurrence
 void find_file_by_name(FILE* f, node* actual, bool* found, char word[MAXNAMESIZE]){
 	if(actual->is_page){
 		int number;
@@ -866,6 +866,7 @@ void find_file_by_name(FILE* f, node* actual, bool* found, char word[MAXNAMESIZE
 	}
 }
 
+//Searches in all files of the word exists
 void search_in_files(char word[MAXWORDSIZE]) {
 	FILE *f;
 	if(!(f = fopen(MAIN_FILE,"rb+"))) exit(-1);
@@ -882,6 +883,7 @@ void search_in_files(char word[MAXWORDSIZE]) {
 	fclose(f);
 }
 
+//Finds the page with the author's name and title to print all occurrences 
 void find_author_title(FILE* f, node* actual, bool* found, char name[MAXNAMESIZE], char title[MAXNAMESIZE], char word[MAXWORDSIZE]){
 	if(actual->is_page){
 		int number;
@@ -938,6 +940,7 @@ void find_author_title(FILE* f, node* actual, bool* found, char name[MAXNAMESIZE
 	}
 }
 
+//Makes a search by authors name, title and the word
 void word_search(char word[MAXWORDSIZE], char author_name[MAXNAMESIZE], char title[MAXNAMESIZE]) {
 	FILE *f;
 	if(!(f = fopen(MAIN_FILE,"rb+"))) exit(-1);
